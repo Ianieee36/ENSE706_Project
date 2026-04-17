@@ -1,8 +1,8 @@
 using System;
 
-namespace FBS.Model
+namespace FlightBookingSystem.Model
 {
-    class User
+    public class User
     {
         // private fields (attributes)
         private string userId;
@@ -14,7 +14,7 @@ namespace FBS.Model
         private string address;
         private string phoneNumber;
 
-        // User Constructor 
+        // User constructor 
         public User(string userId, string email, string password, Role role, string name, 
                    string dateOfBirth, string address, string phoneNumber)
         {
@@ -31,17 +31,20 @@ namespace FBS.Model
         // public properties (read-only)
         public string UserId
         {
-            get{return userId;}     
+            get{return userId;}
+            private set{userId = value;}     
         }
 
         public string Email
         {
-            get{return email;}   
+            get{return email;}
+            private set{email = value;}   
         }
 
         public string Password
         {
             get{return password;}    
+            private set{password = value;}
         }
 
         public Role UserRole
@@ -52,21 +55,43 @@ namespace FBS.Model
         public string Name
         {
             get{return name;}
+            private set{name = value;}
         }
         
-        public string DateOfBirth
+        public DateTime DateOfBirth
         {
             get{return dateOfBirth;}
+            private set{dateOfBirth = value;}
         }
         
         public string Address
         {
             get{return address;}
+            private set{address = value;}
         }
 
         public string PhoneNumber
         {
             get{return phoneNumber;}
+            private set{phoneNumber = value;}
+        }
+
+        public void UpdateProfile(string newName, string newAddress, string newPhoneNumber)
+        {
+            Name = newName;
+            Address = newAddress;
+            PhoneNumber = newPhoneNumber;
+        }
+
+        public bool ChangePassword(string oldPassword, string newPassword)
+        {
+            if(Password != oldPassword)
+            {
+                return false;
+            }
+            
+            Password = newPassword;
+            return true;
         }
 
     }

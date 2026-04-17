@@ -1,11 +1,11 @@
 using System;
 
-namespace FBS.Model
+namespace FlightBookingSystem.Model
 {
     public enum BookingStatus
     {
         PENDING,
-        BOOKED,
+        CONFIRMED,
         CANCELLED
     }
 }

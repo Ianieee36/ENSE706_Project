@@ -1,8 +1,8 @@
 using System;
 
-namespace FBS.Model
+namespace FlightBookingSystem.Model
 {
-    class Flight
+    public class Flight
     {
         // private fields
         private string flightId;
@@ -53,6 +53,26 @@ namespace FBS.Model
         public int TotalSeats
         {
             get{return totalSeats;}
+        }
+
+        public bool HasAvailableSeats()
+        {
+            return availableSeats > 0;
+        }
+
+        public void UpdateSeatCount(Flight flightId, int seatsToReduce)
+        {
+            if (seatsToReduce <= 0)
+            {
+                throw new ArgumentException("Seats to reduce must be greater than zero.");
+            }
+
+            if(availableSeats < seatsToReduce)
+            {
+                throw new InvalidOperationException("Not enough seats available");
+            }
+
+            availableSeats -= seatsToReduce;
         }
     }
 }

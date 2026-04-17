@@ -1,13 +1,13 @@
 using System;
 
-namespace FBS.Model
+namespace FlightBookingSystem.Model
 {
-    class Booking
+    public class Booking
     {
         // private fields
         private string bookingId;
-        private string userId;
-        private string flightId;
+        private User user;
+        private Flight flight;
         private DateTime bookingDate;
         private BookingStatus status;
 
@@ -46,6 +46,36 @@ namespace FBS.Model
         {
             get{return status;}
             private set{status = value;} // attribute can only modify by its own class.
+        }
+
+        public void Confirm()
+        {
+            if (Status != BookingStatus.PENDING)
+            {
+                throw new InvalidOperationException("Only pending bookings can be confirmed");
+            }
+
+            Status = BookingStatus.CONFIRMED;
+        }
+
+        public void Cancel()
+        {
+            if (!CanBeCancelled())
+            {
+                throw new InvalidOperationException("This booking cannot be cancelled");
+            }
+
+            Status = BookingStatus.CANCELLED;
+        }
+
+        public bool IsActive()
+        {
+            return Status == BookingStatus.CONFIRMED;
+        }
+
+        public bool CanBeCancelled()
+        {
+            return Status == BookingStatus.PENDING || Status == BookingStatus.CONFIRMED;
         }
     }
 }

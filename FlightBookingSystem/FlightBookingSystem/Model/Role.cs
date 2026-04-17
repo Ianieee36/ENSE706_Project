@@ -1,6 +1,6 @@
 using System;
 
-namespace FBS.Model
+namespace FlightBookingSystem.Model
 {
     public enum Role 
     {
