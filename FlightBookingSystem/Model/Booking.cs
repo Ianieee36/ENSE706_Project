@@ -16,8 +16,8 @@ namespace FlightBookingSystem.Model
                        DateTime bookingDate)
         {
             this.bookingId = bookingId;
-            this.Customer = customer;
-            this.Flight = flight;
+            this.customer = customer;
+            this.flight = flight;
             this.bookingDate = bookingDate;
             this.status = BookingStatus.PENDING; // Initial state
         }
