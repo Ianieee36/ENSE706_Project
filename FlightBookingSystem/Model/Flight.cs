@@ -28,31 +28,37 @@ namespace FlightBookingSystem.Model
         public string FlightId
         {
             get{return flightId;}
+            private set{flightId = value;}
         }
 
         public string Origin
         {
             get{return origin;}
+            private set{origin = value;}
         }
 
         public string Destination
         {
             get{return destination;}
+            private set{destination = value;}
         }
 
         public DateTime DepartureDateTime
         {
             get{return departureDateTime;}
+            private set{departureDateTime = value;}
         }
 
         public int AvailableSeats
         {
             get{return availableSeats;}
+            private set{availableSeats = value;}
         }
 
         public int TotalSeats
         {
             get{return totalSeats;}
+            private set{totalSeats = value;}
         }
 
         public bool HasAvailableSeats()
@@ -76,7 +82,4 @@ namespace FlightBookingSystem.Model
         }
     }
 }
-
-
-
 

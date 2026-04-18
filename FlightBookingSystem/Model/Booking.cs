@@ -6,18 +6,18 @@ namespace FlightBookingSystem.Model
     {
         // private fields
         private string bookingId;
-        private User user;
+        private User customer;
         private Flight flight;
         private DateTime bookingDate;
         private BookingStatus status;
 
         // Booking constructor
-        public Booking(string bookingId, string userId, string flightId, 
+        public Booking(string bookingId, User customer, Flight flight, 
                        DateTime bookingDate)
         {
             this.bookingId = bookingId;
-            this.userId = userId;
-            this.flightId = flightId;
+            this.Customer = customer;
+            this.Flight = flight;
             this.bookingDate = bookingDate;
             this.status = BookingStatus.PENDING; // Initial state
         }
@@ -25,21 +25,25 @@ namespace FlightBookingSystem.Model
         public string BookingId
         {
             get{return bookingId;}
+            private set{bookingId = value;}
         }
 
-        public string UserId
+        public User Customer
         {
-            get{return userId;}
+            get{return customer;}
+            private set{customer = value;}
         }
 
-        public string FlightId
+        public Flight Flight
         {
-            get{return flightId;}
+            get{return flight;}
+            private set{flight = value;}
         }
 
         public DateTime BookingDate
         {
             get{return bookingDate;}
+            private set{bookingDate = value;}
         }
 
         public BookingStatus Status
@@ -79,7 +83,3 @@ namespace FlightBookingSystem.Model
         }
     }
 }
-
-
-
-

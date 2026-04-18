@@ -10,13 +10,13 @@ namespace FlightBookingSystem.Model
         private string password;
         private Role role;
         private string name;
-        private string dateOfBirth;
+        private DateTime dateOfBirth;
         private string address;
         private string phoneNumber;
 
         // User constructor 
         public User(string userId, string email, string password, Role role, string name, 
-                   string dateOfBirth, string address, string phoneNumber)
+                   DateTime dateOfBirth, string address, string phoneNumber)
         {
             this.userId = userId;
             this.email = email;
@@ -49,7 +49,8 @@ namespace FlightBookingSystem.Model
 
         public Role UserRole
         {
-            get {return role;}    
+            get {return role;}
+            private set{role = value;}    
         }
 
         public string Name
