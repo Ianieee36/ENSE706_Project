@@ -12,8 +12,8 @@ using FlightBookingSystem.Model;
 
         static List<Flight> flights = new List<Flight>
             {
-                new Flight("F001", "Auckland", "Wellington", new DateTime(2026, 4, 18, 8, 0, 0), 50),
-                new Flight("F002", "Wellington", "Christchurch", new DateTime(2026, 4, 20, 20, 0, 0), 50)
+                new Flight("F001", "Auckland", "Wellington", new DateTime(2026, 4, 18, 8, 0, 0), 2),
+                new Flight("F002", "Wellington", "Christchurch", new DateTime(2026, 4, 20, 20, 0, 0), 1)
             };
 
 
@@ -22,7 +22,7 @@ using FlightBookingSystem.Model;
 
         static int nextCustomerNumber = 1; // counter for customerId
 
-        static void Main(string[] args)
+        static void Main(string[] args) // Main Menu
         {
             bool exit = false;
 
@@ -41,20 +41,26 @@ using FlightBookingSystem.Model;
 
                 switch(choice)
                 {
-                    case "1": SearchFlights();
-                    break;
-                    case "2": Login();
-                    break;
-                    case "3": RegisterCustomer();
-                    break;
-                    case "4": exit = true;
-                    default: Console.WriteLine("Invalid");
-                    Pause();
-                    break;
+                    case "1": 
+                        SearchFlights();
+                        break;
+                    case "2": 
+                        Login();
+                        break;
+                    case "3": 
+                        RegisterCustomer();
+                        break;
+                    case "4": 
+                        exit = true;
+                        break;
+                    default: 
+                        Console.WriteLine("Invalid");
+                        Pause();
+                        break;
                 }
             }
         }
-        static void Login()
+        static void Login() // Login Menu
         {
             Console.Clear();
             Console.WriteLine("=== Welcome to Air New Zealand ===");
@@ -67,18 +73,18 @@ using FlightBookingSystem.Model;
 
             User foundUser = null;
 
-            foreach(User u in users)
+            foreach(User u in users) // search from list of Users
             {
-                if(u.Email.ToLower() == email.ToLower() && u.Password.ToLower() == password.ToLower())
+                if(u.Email.ToLower() == email.ToLower() && u.Password.ToLower() == password.ToLower()) // validate email and password
                 {
-                    foundUser = u;
+                    foundUser = u; // user found
                     break;
                 }
             }
 
-            if(foundUser == null)
+            if(foundUser == null) // user does not exists
             {
-                Console.WriteLine("Invalid login");
+                Console.WriteLine("Invalid login"); 
                 Pause();
                 return;
             }
@@ -86,17 +92,17 @@ using FlightBookingSystem.Model;
             Console.WriteLine($"Login successful. Welcome {foundUser.Name}");
             Pause();
 
-            if(foundUser.UserRole == Role.CUSTOMER)
+            if(foundUser.UserRole == Role.CUSTOMER) // check if the user is customer
             {
-                CustomerMenu(foundUser);
+                CustomerMenu(foundUser); // displays customer menu
             }
             else if(foundUser.UserRole == Role.ADMIN)
             {
-                AdminMenu();
+                AdminMenu(); // displays admin menu
             }
         }
 
-        static void CustomerMenu(User customer)
+        static void CustomerMenu(User customer) 
         {
             bool logout = false;
 
@@ -170,7 +176,7 @@ using FlightBookingSystem.Model;
             }
         }
 
-        static void SearchFlights()
+        static void SearchFlights() 
         {
             Console.Clear();
             Console.WriteLine("=== Search for Flights ===");
@@ -180,31 +186,32 @@ using FlightBookingSystem.Model;
             Console.Write("Enter destination: ");
             string? destination = Console.ReadLine();
 
-            List<Flight> results = new List<Flight>();
+            List<Flight> results = new List<Flight>(); // create an empty list
 
-            foreach(Flight f in flights)
+            foreach(Flight f in flights) // iterate through list of flights
             {
                 if(f.Origin.ToLower() == origin.ToLower() && 
-                   f.Destination.ToLower() == destination.ToLower())
+                   f.Destination.ToLower() == destination.ToLower()) // checks if the flight exists
                 {
-                    results.Add(f);
+                    results.Add(f); // flight exists
                 }
             }
 
-            if(results.Count == 0)
+            if(results.Count == 0) 
             {
-                Console.WriteLine("No flights found.");
+                Console.WriteLine("No flights found."); 
                 Pause();
                 return;
             }
-
+            
+            // Displays available flights
             Console.WriteLine("\nAvailable Flights:");
             foreach(Flight fList in results)
             {
                 Console.WriteLine($"{fList.FlightId} | {fList.Origin} -> {fList.Destination} | {fList.DepartureDateTime:dd/MM/yyyy hh:mm tt} | Seats: {fList.AvailableSeats}");
             }
 
-            Console.WriteLine("\n1. View Flight Details");
+            Console.WriteLine("\n1. View Flight Details"); // prompts if user wants to view flight details
             Console.WriteLine("2. Back to Menu");
             string? choice = Console.ReadLine();
 
@@ -222,29 +229,30 @@ using FlightBookingSystem.Model;
             }       
         }
 
-        static void ViewFlightDetails()
+        static void ViewFlightDetails() 
         {
             Console.Clear();
-            Console.WriteLine("\nEnter Flight ID:");
+            Console.WriteLine("\nEnter Flight ID:"); 
             string? flightId = Console.ReadLine();
 
-            Flight? selectedFlight = null;
+            Flight? selectedFlight = null; // create a placeholder for selected flight 
 
-            foreach(Flight f in flights)
+            foreach(Flight f in flights) // iterate through list of flights
             {
-                if(f.FlightId.ToLower() == flightId.ToLower())
+                if(f.FlightId.ToLower() == flightId.ToLower()) // checks if flightId matches to any existing flights
                 {
-                    selectedFlight = f;
+                    selectedFlight = f; // flight found
                     break;
                 }
             }
 
-            if(selectedFlight == null)
+            if(selectedFlight == null) 
             {
                 Console.WriteLine("Flight not found.");
             }
             else
             {
+                // Displays flight details
                 Console.WriteLine($"\nFlight ID: {selectedFlight.FlightId}");
                 Console.WriteLine($"Origin: {selectedFlight.Origin}");
                 Console.WriteLine($"Destination: {selectedFlight.Destination}");
@@ -261,25 +269,25 @@ using FlightBookingSystem.Model;
             Console.Clear();
             Console.WriteLine("=== Register as Customer === ");
 
-            string userId = "CS" + (nextCustomerNumber + 1).ToString("00");
+            string userId = "CS" + (nextCustomerNumber + 1).ToString("00"); // creates unique userId for newly registered customer.
 
             Console.Write("Enter email: ");
             string? email = Console.ReadLine();
 
-            bool exists = false;
+            bool exists = false; 
 
-            foreach(User u in users)
+            foreach(User u in users) // iterate through list of users
             {
-                if(u.Email.ToLower() == email.ToLower())
+                if(u.Email.ToLower() == email.ToLower()) // checks if the email matches any registered users
                 {
-                    exists = true;
+                    exists = true; // matched
                     break;
                 }
             }
 
             if (exists)
             {
-                Console.WriteLine("Email already exists.");
+                Console.WriteLine("Email already exists. Please login to your account");
                 Pause();
                 return;
             }
@@ -291,10 +299,11 @@ using FlightBookingSystem.Model;
             string? name = Console.ReadLine();
 
             DateTime dateOfBirth;
+
             while (true)
             {
-                Console.Write("Enter date of birth (dd/mm/yyyy): ");
-                if(DateTime.TryParse(Console.ReadLine(), out dateOfBirth))
+                Console.Write("Enter date of birth (mm/dd/yyyy): ");
+                if(DateTime.TryParse(Console.ReadLine(), out dateOfBirth)) // it converts string into DateTime format
                 {
                     break;
                 }
@@ -307,7 +316,7 @@ using FlightBookingSystem.Model;
             Console.Write("Enter phone number: ");
             string? phoneNumber = Console.ReadLine();
 
-            User newCustomer = new User(
+            User newCustomer = new User( // add new User object
                 userId,
                 email!,
                 password!,
@@ -318,8 +327,8 @@ using FlightBookingSystem.Model;
                 phoneNumber!
             );
 
-            users.Add(newCustomer);
-            nextCustomerNumber++;
+            users.Add(newCustomer); // add to the list
+            nextCustomerNumber++; // increments UserId 
 
             Console.WriteLine("Registration successful. You can now log in as a customer.");
             Pause();
@@ -328,13 +337,13 @@ using FlightBookingSystem.Model;
         static void BookFlight(User customer)
         {
             Console.Clear();
-            Console.WriteLine("=== Book Flight ===");
+            Console.WriteLine("\n=== Book Flight ===");
             ViewAllFlightWithoutPause();
 
             Console.Write("\nEnter Flight ID to book: ");
-            string? flightId = Console.ReadLine();
+            string? flightId = Console.ReadLine().ToUpper();
 
-            Flight? selectedFlight = null;
+            Flight? selectedFlight = null; 
 
             foreach(Flight f in flights)
             {
@@ -352,7 +361,7 @@ using FlightBookingSystem.Model;
                 return;
             }
 
-            if (!selectedFlight.HasAvailableSeats())
+            if (!selectedFlight.HasAvailableSeats()) // checks if flight has available seats
             {
                 Console.WriteLine("Sorry, there are no available seats!");
                 Pause();
@@ -361,11 +370,11 @@ using FlightBookingSystem.Model;
 
             bool alreadyBooked = false;
 
-            foreach(Booking b in bookings)
+            foreach(Booking b in bookings) // avoids double booking
             {
-                if(b.Customer.UserId == customer.UserId && 
+                if(b.Customer.UserId == customer.UserId &&          
                    b.Flight.FlightId == selectedFlight.FlightId &&
-                   b.Status != BookingStatus.CANCELLED)
+                   b.Status != BookingStatus.CANCELLED) 
                 {
                     alreadyBooked = true;
                     break;
@@ -379,19 +388,19 @@ using FlightBookingSystem.Model;
                 return;
             }
 
-            Booking booking = new Booking(
+            Booking booking = new Booking( // new Booking object
                 "B" + nextBookingNumber.ToString("000"),
                 customer,
                 selectedFlight,
                 DateTime.Now
             );
 
-            selectedFlight.UpdateSeatCount(selectedFlight, 1);
-            booking.Confirm();
-            bookings.Add(booking);
-            nextBookingNumber++;
+            selectedFlight.UpdateSeatCount(selectedFlight, 1); // updates seat count 
+            booking.Confirm(); // change booking status to CONFIRMED
+            bookings.Add(booking); // add bookings to the list
+            nextBookingNumber++; // increments bookingId
 
-            Console.WriteLine("===You successfully booked your flight===");
+            Console.WriteLine("\n===You successfully booked your flight===");
             Console.WriteLine("============= Safe Travels! =============");
             Console.WriteLine($"Booking ID: {booking.BookingId}");
             Console.WriteLine($"Status: {booking.Status}");
@@ -402,47 +411,48 @@ using FlightBookingSystem.Model;
         static void ViewMyBookings(User customer)
         {
             Console.Clear();
-            Console.WriteLine("====== My Bookings ======");
+            Console.WriteLine("\n====== My Bookings ======");
 
-            List<Booking> myBookings = new List<Booking>();
+            List<Booking> myBookings = new List<Booking>(); // empty list
 
             foreach(Booking b in bookings)
             {
                 if(b.Customer.UserId == customer.UserId)
                 {
-                    myBookings.Add(b);
+                    myBookings.Add(b); // add to the list
                 }
             }
 
-            if(myBookings.Count == 0)
+            if(myBookings.Count == 0) 
             {
                 Console.WriteLine("No Bookings Found");
             }
             else
-            {
+            {   
+                // displays all bookings
                 foreach(Booking booking in myBookings)
                 {
-                    Console.WriteLine($"{booking.BookingId} | {booking.Flight.FlightId} | {booking.Flight.Origin} -> {booking.Flight.Destination} {booking.Status}");
+                    Console.WriteLine($"\n{booking.BookingId} | {booking.Flight.FlightId} | {booking.Flight.Origin} -> {booking.Flight.Destination} | {booking.Flight.DepartureDateTime} | {booking.Status}");
                 }
             }                    
             Pause();
         }
 
-        static void AddFlight()
+        static void AddFlight() // Admin-Acess Only
         {
             Console.Clear();
-            Console.WriteLine("====== Add Flight ======");
+            Console.WriteLine("\n====== Add Flight ======");
 
-            Console.Write("Enter Flight ID: ");
+            Console.Write("\nEnter Flight ID: ");
             string? flightId = Console.ReadLine();
 
-            bool flightExists = false;
+            bool flightExists = false; 
 
-            foreach(Flight f in flights)
+            foreach(Flight f in flights) 
             {
-                if(f.FlightId.ToLower() == flightId.ToLower())
+                if(f.FlightId.ToLower() == flightId.ToLower()) // checks flight existence
                 {
-                    flightExists = true;
+                    flightExists = true; // flight exists
                     break;
                 }
             }
@@ -460,12 +470,12 @@ using FlightBookingSystem.Model;
             Console.Write("Enter Destination: ");
             string? destination = Console.ReadLine();
 
-            DateTime departureDateTime;
+            DateTime departureDateTime; // stores date and time
 
             while (true)
             {
                 Console.Write("Enter departure date and time (mm/dd/yyyy hh:mm AM/PM): ");
-                if(DateTime.TryParse(Console.ReadLine(), out departureDateTime))
+                if(DateTime.TryParse(Console.ReadLine(), out departureDateTime)) 
                 {
                     break;
                 }
@@ -483,7 +493,7 @@ using FlightBookingSystem.Model;
                 Console.WriteLine("Please enter a valid number greater than 0");
             }
 
-            Flight newFlight = new Flight(
+            Flight newFlight = new Flight( // add new Flight object
                 flightId!,
                 origin!,
                 destination!,
@@ -491,7 +501,7 @@ using FlightBookingSystem.Model;
                 totalSeats
             );
 
-            flights.Add(newFlight);
+            flights.Add(newFlight); // add to the list of flights
 
             Console.WriteLine("Flight added successfully");
             Pause();
@@ -505,7 +515,7 @@ using FlightBookingSystem.Model;
             Pause();
         }
 
-        static void ViewAllFlightWithoutPause()
+        static void ViewAllFlightWithoutPause() // helper to list flights
         {
             foreach(Flight flight in flights)
             {
@@ -513,7 +523,7 @@ using FlightBookingSystem.Model;
             }
         }
 
-        static void Pause()
+        static void Pause() // helper buffer 
         {
             Console.WriteLine();
             Console.WriteLine("Press Enter to continue...");
