@@ -66,7 +66,7 @@ namespace FlightBookingSystem.Model
             return availableSeats > 0;
         }
 
-        public void UpdateSeatCount(Flight flightId, int seatsToReduce)
+        public void UpdateSeatCount(int seatsToReduce)
         {
             if (seatsToReduce <= 0)
             {

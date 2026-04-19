@@ -395,7 +395,7 @@ using FlightBookingSystem.Model;
                 DateTime.Now
             );
 
-            selectedFlight.UpdateSeatCount(selectedFlight, 1); // updates seat count 
+            selectedFlight.UpdateSeatCount(1); // updates seat count 
             booking.Confirm(); // change booking status to CONFIRMED
             bookings.Add(booking); // add bookings to the list
             nextBookingNumber++; // increments bookingId
