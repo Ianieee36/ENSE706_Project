@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using FlightBookingSystem.Model;
  class Program
     {
-        static List<User> users = new List<User>
+        static List<User> users = new List<User> // in-memory lists
             {
                 new User("AD01", "admin01@airnz.co.nz", "pass123", Role.ADMIN, "Admin User", new DateTime(1990, 01, 01), "Auckland", "22122341243"),
                 new User("CS01", "customer01@hotmail.com", "pass123", Role.CUSTOMER, "Customer User", new DateTime(2003, 03, 06), "ChristChurch", "23155876432")
@@ -16,10 +16,11 @@ using FlightBookingSystem.Model;
                 new Flight("F002", "Wellington", "Christchurch", new DateTime(2026, 4, 20, 20, 0, 0), 50)
             };
 
-        static List<Booking> bookings = new List<Booking>();
-        static int nextBookingNumber = 1;
 
-        static int nextCustomerNumber = 1;
+        static List<Booking> bookings = new List<Booking>(); // storage for created bookings
+        static int nextBookingNumber = 1; // counter for bookingId
+
+        static int nextCustomerNumber = 1; // counter for customerId
 
         static void Main(string[] args)
         {
@@ -30,21 +31,23 @@ using FlightBookingSystem.Model;
                 Console.Clear();
                 Console.WriteLine("\n============ Air New Zealand ==============");
                 Console.WriteLine("====Flight Booking System (Demo Version) ====");
-                Console.WriteLine("1. Continue as Guest");
+                Console.WriteLine("1. Search for flights");
                 Console.WriteLine("2. Login");
-                Console.WriteLine("3. Exit");
+                Console.WriteLine("3. Register");
+                Console.WriteLine("4. Exit");
                 Console.Write("Select option: ");
 
                 string? choice = Console.ReadLine();
 
                 switch(choice)
                 {
-                    case "1": GuestMenu();
+                    case "1": SearchFlights();
                     break;
                     case "2": Login();
                     break;
-                    case "3": exit = true; 
+                    case "3": RegisterCustomer();
                     break;
+                    case "4": exit = true;
                     default: Console.WriteLine("Invalid");
                     Pause();
                     break;
@@ -92,47 +95,6 @@ using FlightBookingSystem.Model;
                 AdminMenu();
             }
         }
-
-        static void GuestMenu()
-        {
-            bool back = false;
-
-            while (!back)
-            {   
-                Console.Clear(); 
-                Console.WriteLine("====== Welcome to Air New Zealand ======");
-                Console.WriteLine("======== Flight Booking System =========");
-                Console.WriteLine("1. Search Flights ");
-                Console.WriteLine("2. Login");
-                Console.WriteLine("3. Register");
-                Console.WriteLine("4. Back");
-                Console.Write("Selectio option: ");
-
-                string? choice = Console.ReadLine();
-
-                switch(choice)
-                {
-                    case "1":
-                        SearchFlights();
-                        break;
-                    case "2":
-                        Login();
-                        break;
-                    case "3":
-                        RegisterCustomer();
-                        break;
-                    case "4":
-                        back = true;
-                        break;
-                    default:
-                        Console.WriteLine("Invalid option");
-                        Pause();
-                        break;
-                }
-    
-            }
-        }
-
 
         static void CustomerMenu(User customer)
         {
