@@ -302,7 +302,7 @@ using FlightBookingSystem.Model;
 
             while (true)
             {
-                Console.Write("Enter date of birth (dd/MM/yyyy): ");
+                Console.Write("Enter date of birth (mm/dd/yyyy): ");
                 if(DateTime.TryParse(Console.ReadLine(), out dateOfBirth)) // it converts string into DateTime format
                 {
                     break;
@@ -444,7 +444,7 @@ using FlightBookingSystem.Model;
             Console.WriteLine("\n====== Add Flight ======");
 
             Console.Write("\nEnter Flight ID: ");
-            string? flightId = Console.ReadLine().ToUpper();
+            string? flightId = Console.ReadLine();
 
             bool flightExists = false; 
 
@@ -474,8 +474,8 @@ using FlightBookingSystem.Model;
 
             while (true)
             {
-                Console.Write("Enter departure date and time (dd/MM/yyyy hh:mm AM/PM): ");
-                if(DateTime.TryParse(Console.ReadLine().ToUpper(), out departureDateTime)) 
+                Console.Write("Enter departure date and time (mm/dd/yyyy hh:mm AM/PM): ");
+                if(DateTime.TryParse(Console.ReadLine(), out departureDateTime)) 
                 {
                     break;
                 }
