@@ -71,7 +71,7 @@ using FlightBookingSystem.Model;
             Console.Write("Enter your password:");
             string? password = Console.ReadLine();
 
-            User foundUser = null;
+            User? foundUser = null;
 
             foreach(User u in users) // search from list of Users
             {
