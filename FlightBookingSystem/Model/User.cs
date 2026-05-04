@@ -7,22 +7,24 @@ namespace FlightBookingSystem.Model
         // private fields (attributes)
         private string userId;
         private string email;
-        private string password;
+        private string passwordHash;
         private Role role;
-        private string name;
+        private string firstName;
+        private string lastName;
         private DateTime dateOfBirth;
         private string address;
         private string phoneNumber;
 
         // User constructor 
-        public User(string userId, string email, string password, Role role, string name, 
+        public User(string userId, string email, string passwordHash, Role role, string firstName, string lastName, 
                    DateTime dateOfBirth, string address, string phoneNumber)
         {
             this.userId = userId;
             this.email = email;
-            this.password = password;
+            this.passwordHash = passwordHash;
             this.role = role;
-            this.name = name;
+            this.firstName = firstName;
+            this.lastName = lastName;
             this.dateOfBirth = dateOfBirth;
             this.address = address;
             this.phoneNumber = phoneNumber;
@@ -41,10 +43,10 @@ namespace FlightBookingSystem.Model
             private set{email = value;}   
         }
 
-        public string Password
+        public string PasswordHash
         {
-            get{return password;}    
-            private set{password = value;}
+            get{return passwordHash;}    
+            private set{passwordHash = value;}
         }
 
         public Role UserRole
@@ -53,11 +55,22 @@ namespace FlightBookingSystem.Model
             private set{role = value;}    
         }
 
-        public string Name
+        public string FirstName
         {
-            get{return name;}
-            private set{name = value;}
+            get{return firstName;}
+            private set{firstName = value;}
         }
+
+        public string LastName
+        {
+            get{return lastName;} 
+            private set{lastName = value;}
+        }  
+
+        public string FullName
+        {
+            get {return FullName + " " + LastName;}
+        } 
         
         public DateTime DateOfBirth
         {
@@ -77,9 +90,10 @@ namespace FlightBookingSystem.Model
             private set{phoneNumber = value;}
         }
 
-        public void UpdateProfile(string newName, string newAddress, string newPhoneNumber)
+        public void UpdateProfile(string newfName, string newlName, string newAddress, string newPhoneNumber)
         {
-            Name = newName;
+            FirstName = newfName;
+            LastName = newlName;
             Address = newAddress;
             PhoneNumber = newPhoneNumber;
         }
