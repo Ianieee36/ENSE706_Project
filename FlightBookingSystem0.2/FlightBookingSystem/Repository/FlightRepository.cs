@@ -4,7 +4,7 @@ using Oracle.ManagedDataAccess.Client;
 
 namespace FlightBookingSystem.Repository
 {
-    public class FlightRepository : IFlightRepository
+    internal class FlightRepository : IFlightRepository
     {
         DatabaseConnection dbConnection = new DatabaseConnection();
         public void FindAllFlights()

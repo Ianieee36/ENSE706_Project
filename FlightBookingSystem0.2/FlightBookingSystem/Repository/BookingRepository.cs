@@ -4,7 +4,7 @@ using Oracle.ManagedDataAccess.Client;
 
 namespace FlightBookingSystem.Repository
 {
-    public class BookingRepository : IBookingRepository
+    internal class BookingRepository : IBookingRepository
     {
         private readonly IUserRepository userRepository;
         private readonly IFlightRepository flightRepository;
