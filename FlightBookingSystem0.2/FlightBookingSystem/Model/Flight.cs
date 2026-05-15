@@ -66,19 +66,21 @@ namespace FlightBookingSystem.Model
             return availableSeats > 0;
         }
 
-        public void UpdateSeatCount(int seatsToReduce)
+        public void UpdateSeatCount(int change)
         {
-            if (seatsToReduce <= 0)
+            int newSeatCount = AvailableSeats + change;
+
+            if(newSeatCount < 0)
             {
-                throw new ArgumentException("Seats to reduce must be greater than zero.");
+                throw new InvalidOperationException("Not enough seats available.");
             }
 
-            if(availableSeats < seatsToReduce)
+            if(newSeatCount > TotalSeats)
             {
-                throw new InvalidOperationException("Not enough seats available");
+                throw new InvalidOperationException("Available seats cannot exceed total seats.");
             }
 
-            availableSeats -= seatsToReduce;
+            AvailableSeats = newSeatCount;
         }
     }
 }
