@@ -54,3 +54,4 @@ TestResult.xml
 nunit-*.xml
 ~WRL3526.tmp
 .DS_Store
+*.lscache
