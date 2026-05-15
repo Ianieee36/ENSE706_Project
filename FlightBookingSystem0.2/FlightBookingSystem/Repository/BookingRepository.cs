@@ -17,21 +17,21 @@ namespace FlightBookingSystem.Repository
             dbConnection = new DatabaseConnection();
         }
 
-        public Booking? FindBookingsByUserId(string userId)
+        public Booking? FindBookingById(string bookingId)
         {
             using OracleConnection conn = dbConnection.GetConnection();
             conn.Open();
 
-            string query = "SELECT * FROM BOOKINGS WHERE USERID = :userId";
+            string query = "SELECT * FROM BOOKINGS WHERE BOOKINGID = :bookingId";
 
             using OracleCommand cmd = new OracleCommand(query, conn);
-            cmd.Parameters.Add(new OracleParameter("userId", userId));
+            cmd.Parameters.Add(new OracleParameter("bookingId", bookingId));
 
             using OracleDataReader reader = cmd.ExecuteReader();
 
             if (reader.Read())
             {
-                string bookingId = reader["BOOKINGID"].ToString()!;
+                string dbBookingId = reader["BOOKINGID"].ToString()!;
                 DateTime bookingDate = Convert.ToDateTime(reader["BOOKINGDATE"]);
                 BookingStatus status = Enum.Parse<BookingStatus>(reader["BOOKINGSTATUS"].ToString()!);
 
@@ -52,7 +52,7 @@ namespace FlightBookingSystem.Repository
             return null;
         }
 
-        public Booking? FindBookingsByFlightId(string flightId)
+        public Booking? FindBookingByFlightId(string flightId)
         {
             using OracleConnection conn = dbConnection.GetConnection();
             conn.Open();
@@ -86,6 +86,21 @@ namespace FlightBookingSystem.Repository
                 
             }
             return null;
+        }
+
+        public void UpdateBooking(Booking booking)
+        {
+            using OracleConnection conn = dbConnection.GetConnection();
+            conn.Open();
+
+            string query = "UPDATE BOOKINGS SET STATUS = :status WHERE BOOKINGID = :bookingId";
+
+            using OracleCommand cmd = new OracleCommand(query, conn);
+
+            cmd.Parameters.Add(new OracleParameter("status", booking.Status.ToString()));
+            cmd.Parameters.Add(new OracleParameter("bookindId", booking.BookingId));
+            
+            cmd.ExecuteNonQuery();
         }
 
         public void SaveBooking(Booking bookings)
