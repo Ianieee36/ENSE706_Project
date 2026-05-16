@@ -1,13 +1,14 @@
+using System.Collections.Generic;
 using FlightBookingSystem.Model;
 
 namespace FlightBookingSystem.Repository
 {
     public interface IFlightRepository
     {
-        void FindAllFlights();
-        Flight FindFlightById(string flightId);
-        void SaveFlight(Flight flights);
-        void UpdateFlight(Flight flights);
-        void DeleteFlightById(string flightId);
+        List<Flight> FindAllFlights();
+        Flight? FindFlightById(string flightId);
+        void SaveFlight(Flight flight);
+        void UpdateFlight(Flight flight);
+        bool DeleteFlightByFlightId(string flightId);
     }
 }

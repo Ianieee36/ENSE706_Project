@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using FlightBookingSystem.Model;
 using Oracle.ManagedDataAccess.Client;
 
@@ -33,20 +34,20 @@ namespace FlightBookingSystem.Repository
             {
                 string dbBookingId = reader["BOOKINGID"].ToString()!;
                 DateTime bookingDate = Convert.ToDateTime(reader["BOOKINGDATE"]);
-                BookingStatus status = Enum.Parse<BookingStatus>(reader["BOOKINGSTATUS"].ToString()!);
+                BookingStatus status = Enum.Parse<BookingStatus>(reader["STATUS"].ToString()!);
 
                 string dbUserId = reader["USERID"].ToString()!;
                 string dbFlightId = reader["FLIGHTID"].ToString()!;
 
                 User customer = userRepository.FindUserById(dbUserId)!;
-                Flight flight = flightRepository.FindFlightById(dbFlightId);
+                Flight? flight = flightRepository.FindFlightById(dbFlightId);
 
                 return new Booking (
                     bookingId,
                     bookingDate,
                     status,
                     customer,
-                    flight
+                    flight!
                 );
             }
             return null;
@@ -68,15 +69,55 @@ namespace FlightBookingSystem.Repository
             {   
                 string bookingId = reader["BOOKINGID"].ToString()!;
                 DateTime bookingDate = Convert.ToDateTime(reader["BOOKINGDATE"]);
-                BookingStatus status = Enum.Parse<BookingStatus>(reader["BOOKINGSTATUS"].ToString()!);
+                BookingStatus status = Enum.Parse<BookingStatus>(reader["STATUS"].ToString()!);
 
                 string dbUserId = reader["USERID"].ToString()!;
                 string dbFlightId = reader["FLIGHTID"].ToString()!;
 
                 User customer = userRepository.FindUserById(dbUserId)!;
-                Flight flight = flightRepository.FindFlightById(dbFlightId);
+                Flight? flight = flightRepository.FindFlightById(dbFlightId);
 
                 return new Booking (
+                    bookingId,
+                    bookingDate,
+                    status,
+                    customer,
+                    flight!
+                );
+                
+            }
+            return null;
+        }
+
+        public List<Booking> FindBookingsByUserId(string userId)
+        {
+            List<Booking> bookings = new List<Booking>();
+
+            using OracleConnection conn = dbConnection.GetConnection();
+            conn.Open();
+
+            string query = "SELECT * FROM BOOKINGS WHERE USERID = :userId";
+
+            using OracleCommand cmd = new OracleCommand(query, conn);
+            cmd.Parameters.Add(new OracleParameter("userId", userId));
+
+            using OracleDataReader reader = cmd.ExecuteReader();
+
+            while(reader.Read())
+            {   
+                string bookingId = reader["BOOKINGID"].ToString()!;
+                DateTime bookingDate = Convert.ToDateTime(reader["BOOKINGDATE"]);
+                BookingStatus status = Enum.Parse<BookingStatus>(reader["STATUS"].ToString()!);
+
+                string dbUserId = reader["USERID"].ToString()!;
+                string dbFlightId = reader["FLIGHTID"].ToString()!;
+
+                User? customer = userRepository.FindUserById(dbUserId)!;
+                Flight? flight = flightRepository.FindFlightById(dbFlightId);
+
+                if(customer != null && flight != null)
+                {
+                    Booking booking = new Booking(
                     bookingId,
                     bookingDate,
                     status,
@@ -84,9 +125,59 @@ namespace FlightBookingSystem.Repository
                     flight 
                 );
                 
+                bookings.Add(booking);
+                }   
             }
-            return null;
+            return bookings;
         }
+
+        public List<Booking> FindPastBookingsByUserId(string userId)
+        {
+            List<Booking> bookings = new List<Booking>();
+
+            using OracleConnection conn = dbConnection.GetConnection();
+            conn.Open();
+
+            string query = @"
+                    SELECT b.*
+                    FROM BOOKINGS b
+                    JOIN FLIGHTS f ON b.FLIGHTID = f.FLIGHTID
+                    WHERE b.USERID = :userId
+                    AND f.DEPARTURE < SYSTIMESTAMP";
+
+            using OracleCommand cmd = new OracleCommand(query, conn);
+            cmd.Parameters.Add(new OracleParameter("userId", userId));
+
+            using OracleDataReader reader = cmd.ExecuteReader();
+
+            while(reader.Read())
+            {   
+                string bookingId = reader["BOOKINGID"].ToString()!;
+                DateTime bookingDate = Convert.ToDateTime(reader["BOOKINGDATE"]);
+                BookingStatus status = Enum.Parse<BookingStatus>(reader["STATUS"].ToString()!);
+
+                string dbUserId = reader["USERID"].ToString()!;
+                string dbFlightId = reader["FLIGHTID"].ToString()!;
+
+                User? customer = userRepository.FindUserById(dbUserId)!;
+                Flight? flight = flightRepository.FindFlightById(dbFlightId);
+
+                if(customer != null && flight != null)
+                {
+                    Booking booking = new Booking(
+                    bookingId,
+                    bookingDate,
+                    status,
+                    customer,
+                    flight 
+                );
+                
+                bookings.Add(booking);
+                }   
+            }
+            return bookings;  
+        }
+        
 
         public void UpdateBooking(Booking booking)
         {
