@@ -24,6 +24,17 @@ namespace FlightBookingSystem.Model
             this.totalSeats = totalSeats; 
         }
 
+        public Flight(string flightId, string origin, string destination, DateTime departureDateTime, int availableSeats,
+                      int totalSeats)
+        {
+            this.flightId = flightId;
+            this.origin = origin;
+            this.destination = destination;
+            this.departureDateTime = departureDateTime;
+            this.availableSeats = availableSeats;
+            this.totalSeats = totalSeats;
+        }
+
         // public properties (read-only)
         public string FlightId
         {
