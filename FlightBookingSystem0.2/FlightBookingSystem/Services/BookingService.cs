@@ -78,43 +78,57 @@ namespace FlightBookingSystem.Services
         }
         public bool CancelBookingById(string bookingId, string userId)
         {
-            Booking? booking = bookingRepository.FindBookingById(bookingId);
+            Booking? booking = bookingRepository.FindBookingById(bookingId); // checks db if the bookingId exists
 
-            if(booking == null)
+            if(booking == null) // checks if fail to find bookingId
             {
-                Console.WriteLine("Booking not found.");
+                Console.WriteLine("Booking not found."); // return an error message
                 return false;
             }
 
-            if(booking.Customer.UserId != userId)
+            if(booking.Customer.UserId != userId) // checks if the booking belongs to a specific user
             {
                 Console.WriteLine("This booking does not belong to the user.");
                 return false;
             } 
 
-            if(booking.Status == BookingStatus.CANCELLED)
+            if(booking.Status == BookingStatus.CANCELLED) // checks if the status is already cancelled or not 
             {
-                Console.WriteLine("Booking already cancelled.");
+                Console.WriteLine("Booking already cancelled."); // cancellation message
                 return false;
             }
 
-            booking.Cancel();
+            booking.Cancel(); // updates booking status to cancel
 
-            booking.Flight.UpdateSeatCount(1);
+            booking.Flight.UpdateSeatCount(1); // update seat count
 
-            bookingRepository.UpdateBooking(booking);
+            bookingRepository.UpdateBooking(booking); // updates booking status in repository
 
-            flightRepository.UpdateFlight(booking.Flight);
+            flightRepository.UpdateFlight(booking.Flight); // updates flight seats in repository.
 
             return true;
         }
         public List<Booking> GetUserBookingsById(string userId)
         {
-            throw new NotImplementedException();
+            User? user = userRepository.FindUserById(userId); // checks if the user exists
+
+            if(user == null) // checks if the user failed to find a user
+            {
+                return new List<Booking>(); // return a empty list instead of crashing or returning null
+            }
+
+            return bookingRepository.FindBookingsByUserId(userId); // if the user exists the service asks repo to retrieve all existing bookings.
         }
         public List<Booking> GetBookingHistory(string userId)
         {
-            throw new NotImplementedException();
+            User? user = userRepository.FindUserById(userId); // checks if the user exists
+
+            if(user == null) // checks if the user failed to find a user
+            {
+                return new List<Booking>(); // return a empty list instead of crashing or returning null
+            }
+
+            return bookingRepository.FindPastBookingsByUserId(userId); // if the user exists the services asks repo to retrieve past bookigns.
         }
     }
 }
