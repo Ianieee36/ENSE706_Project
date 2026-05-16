@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using FlightBookingSystem.Model;
 using Oracle.ManagedDataAccess.Client;
 
@@ -51,6 +52,48 @@ namespace FlightBookingSystem.Repository
             }
 
             return flights; // return list of flights
+        }
+
+        // Search flights by route
+        public List<Flight> FindFlightsByRoute(string origin, string destination)
+        {
+            List<Flight> flights = new List<Flight>();
+            using OracleConnection conn = dbConnection.GetConnection();
+            conn.Open();
+
+            string query = @"SELECT * FLIGHTS
+                             WHERE LOWER(ORIGIN) = LOWER(:origin)
+                             AND LOWER(DESTINATION) = LOWER(:destination)";
+
+            using OracleCommand cmd = new OracleCommand(query, conn);
+            cmd.Parameters.Add(new OracleParameter("origin", OracleDbType.Varchar2)).Value = origin;
+            cmd.Parameters.Add(new OracleParameter("destination", OracleDbType.Varchar2)).Value = destination;
+
+            using OracleDataReader reader = cmd.ExecuteReader();
+
+            while(reader.Read())
+            {
+                string flightId = reader["FLIGHTID"].ToString()!;
+                string dbOrigin = reader["ORIGIN"].ToString()!;
+                string dbDestination = reader["DESTINATION"].ToString()!;
+                DateTime departure = Convert.ToDateTime(reader["DEPARTURE"]);
+
+                int availableSeats = Convert.ToInt32(reader["AVAILABLESEATS"]);
+                int totalSeats = Convert.ToInt32(reader["TOTALSEATS"]);
+
+                Flight flight = new Flight( // return a flight object
+                    flightId,
+                    dbOrigin,
+                    dbDestination,
+                    departure,
+                    availableSeats,
+                    totalSeats
+                );
+
+                flights.Add(flight);    
+            }
+
+            return flights;
         }
         
         // Finds Flight by flighID
@@ -140,7 +183,7 @@ namespace FlightBookingSystem.Repository
             cmd.ExecuteNonQuery();
          }
         
-        // Deletes Flight from DB by flightId
+        // Deletes Flight from DB by flight id
         public bool DeleteFlightByFlightId(string flightId)
         {
            using OracleConnection conn = dbConnection.GetConnection();
