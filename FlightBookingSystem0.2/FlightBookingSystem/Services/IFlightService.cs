@@ -6,7 +6,7 @@ namespace FlightBookingSystem.Services
     public interface IFlightService
     {
         List<Flight> SearchFlights(string origin, string destination);
-        Flight GetFlightDetails(string flightId);
+        Flight? GetFlightDetailsById(string flightId);
         void AddFlight(Flight flight);
         void UpdateFlight(Flight flight);
         void RemoveFlightById(string flightId);
