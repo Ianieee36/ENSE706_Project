@@ -61,10 +61,12 @@ namespace FlightBookingSystem.Services
 
             flightRepository.DeleteFlightByFlightId(flightId);
         }
+        
         public List<Flight> GetAllFlights()
         {
             return flightRepository.FindAllFlights();
         }
+
         public int GetFlightOccupancy(string flightId)
         {
             Flight? flight = flightRepository.FindFlightById(flightId);

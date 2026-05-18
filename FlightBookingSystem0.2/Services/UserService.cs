@@ -1,6 +1,7 @@
 using System;
 using FlightBookingSystem.Model;
 using FlightBookingSystem.Repository;
+using FlightBookingSystem.Security;
 
 namespace FlightBookingSystem.Services
 {
@@ -22,7 +23,9 @@ namespace FlightBookingSystem.Services
                 return null;
             }
 
-            if(user.PasswordHash != password) // checks if the stored password matches the entered password.
+            string hashedInputPassword = PasswordHasher.HashPassword(password);
+
+            if(user.PasswordHash != hashedInputPassword) // checks if the stored password matches the entered password.
             {
                 return null;
             }
@@ -30,34 +33,21 @@ namespace FlightBookingSystem.Services
             return user; // return user
         }
 
-        public User? Register(string email, string password, Role role, string firstName, 
-                             string lastName, DateTime dateOfBirth, 
-                             string address, string phoneNumber)
+        public User? Register(User user)
         {
-            User? existingUser = userRepository.FindUserByEmail(email); // checks DB with any existing emails
+            User? existingUser = userRepository.FindUserByEmail(user.Email); // checks DB with any existing emails
 
-            if(existingUser != null) // checks if theres existing email
+            // Enail already exists
+            if(existingUser != null) 
             {
                 return null; 
             }
-
-            string userId = Guid.NewGuid().ToString(); // Generate ID
-
-            User newUser = new User( // creates a new User
-                userId,
-                email,
-                password,
-                role,
-                firstName,
-                lastName,
-                dateOfBirth,
-                address,
-                phoneNumber
-            );
-
-            userRepository.SaveUser(newUser); // saves newUser to DB
             
-            return newUser;
+            // Save to database
+            userRepository.SaveUser(user);
+
+            // Return registered user
+            return user;
         }
 
         public User? Logout()
