@@ -7,15 +7,17 @@ namespace FlightBookingSystem.Repository
     public interface IBookingRepository
     {
         Booking? FindBookingById(string bookingId);
-        Booking? FindBookingByFlightId(string flightId);
+        // Booking? FindBookingByFlightId(string flightId);
 
         List<Booking> FindBookingsByUserId(string userId);
+        List<Booking> FindCurrentBookingsByUserId(string userId);
 
         List<Booking> FindPastBookingsByUserId(string userId);
 
         void UpdateBooking(Booking booking);
         void SaveBooking(Booking bookings);
 
-        bool DeleteBookingByBookingId(string bookingId);
+        // bool DeleteBookingByBookingId(string bookingId);
+        bool BookingIdExists(string bookingId);
     }
 }

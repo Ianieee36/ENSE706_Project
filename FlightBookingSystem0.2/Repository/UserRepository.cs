@@ -7,9 +7,9 @@ namespace FlightBookingSystem.Repository
     internal class UserRepository : IUserRepository
     {
         private readonly DatabaseConnection dbConnection;
-        public UserRepository()
+        public UserRepository(DatabaseConnection dbConnection)
         {
-            dbConnection = new DatabaseConnection();
+            this.dbConnection = dbConnection;
         }
 
         public User? FindUserById(string userId)
@@ -110,6 +110,22 @@ namespace FlightBookingSystem.Repository
             object result = cmd.ExecuteScalar();
 
             return result != null;
+        }
+
+
+        public bool UserIdExists(string userId)
+        {
+            using OracleConnection conn = dbConnection.GetConnection();
+            conn.Open();
+
+            string query = "SELECT COUNT(*) FROM USERS WHERE USERID = :userId";
+
+            using OracleCommand cmd = new OracleCommand(query, conn);
+            cmd.Parameters.Add(new OracleParameter("userId", userId));
+
+            int count = Convert.ToInt32(cmd.ExecuteScalar());
+
+            return count > 0;
         }
 
     }

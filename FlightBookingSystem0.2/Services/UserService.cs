@@ -1,7 +1,7 @@
 using System;
 using FlightBookingSystem.Model;
 using FlightBookingSystem.Repository;
-using FlightBookingSystem.Security;
+using FlightBookingSystem.Utilities;
 
 namespace FlightBookingSystem.Services
 {
@@ -9,12 +9,12 @@ namespace FlightBookingSystem.Services
     {
         private readonly IUserRepository userRepository; // interface dependency 
 
-        public UserService()
+        public UserService(IUserRepository userRepository)
         {
-            userRepository = new UserRepository(); // instantiate the UserRepository class
+            this.userRepository = userRepository; // assign injected repository dependency
         }
 
-        public User? Login(string email, string password)
+        public User? Login(string email, string passwordHash)
         {
             User? user = userRepository.FindUserByEmail(email); // search email through the database
 
@@ -23,9 +23,7 @@ namespace FlightBookingSystem.Services
                 return null;
             }
 
-            string hashedInputPassword = PasswordHasher.HashPassword(password);
-
-            if(user.PasswordHash != hashedInputPassword) // checks if the stored password matches the entered password.
+            if(user.PasswordHash != passwordHash) // checks if the stored password matches the entered password.
             {
                 return null;
             }
@@ -42,17 +40,44 @@ namespace FlightBookingSystem.Services
             {
                 return null; 
             }
+
+            string userId = GenerateUniqueUserId();
+
+            User newUser = new User(
+                userId,
+                user.Email,
+                user.PasswordHash,
+                user.UserRole,
+                user.FirstName,
+                user.LastName,
+                user.DateOfBirth,
+                user.Address,
+                user.PhoneNumber
+            );
             
             // Save to database
-            userRepository.SaveUser(user);
+            userRepository.SaveUser(newUser);
 
-            // Return registered user
-            return user;
+            // Return new registered user
+            return newUser;
         }
 
         public User? Logout()
         {
             return null; // logouts user;
+        }
+
+        public string GenerateUniqueUserId()
+        {
+            string userId;
+
+            do
+            {
+                userId = IdGenerator.GenerateUserId();
+            }
+            while (userRepository.UserIdExists(userId));
+
+            return userId;
         }
     }
 }

@@ -9,6 +9,8 @@ namespace FlightBookingSystem.Repository
         void SaveUser(User user);
         bool EmailExists(string email);
 
+        bool UserIdExists(string userId);
+
         
     }
 }

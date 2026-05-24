@@ -8,5 +8,6 @@ namespace FlightBookingSystem.Services
         User? Login(string email, string password);
         User? Register(User user);
         User? Logout();
+        string GenerateUniqueUserId();
     }
 }

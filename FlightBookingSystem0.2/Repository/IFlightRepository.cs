@@ -10,6 +10,7 @@ namespace FlightBookingSystem.Repository
         Flight? FindFlightById(string flightId);
         void SaveFlight(Flight flight);
         void UpdateFlight(Flight flight);
-        bool DeleteFlightByFlightId(string flightId);
+        bool DeleteFlightById(string flightId);
+        bool FlightIdExists(string flightId);
     }
 }

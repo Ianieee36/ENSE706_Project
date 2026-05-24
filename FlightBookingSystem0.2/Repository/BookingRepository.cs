@@ -11,11 +11,11 @@ namespace FlightBookingSystem.Repository
         private readonly IFlightRepository flightRepository;
         private readonly DatabaseConnection dbConnection;
 
-        public BookingRepository()
+        public BookingRepository(IUserRepository userRepository, IFlightRepository flightRepository, DatabaseConnection dbConnection)
         {
-            userRepository = new UserRepository();
-            flightRepository = new FlightRepository();
-            dbConnection = new DatabaseConnection();
+            this.userRepository = userRepository;
+            this.flightRepository = flightRepository;
+            this.dbConnection = dbConnection;
         }
 
         public Booking? FindBookingById(string bookingId)
@@ -53,41 +53,41 @@ namespace FlightBookingSystem.Repository
             return null;
         }
 
-        public Booking? FindBookingByFlightId(string flightId)
-        {
-            using OracleConnection conn = dbConnection.GetConnection();
-            conn.Open();
+        // public Booking? FindBookingByFlightId(string flightId)
+        // {
+        //     using OracleConnection conn = dbConnection.GetConnection();
+        //     conn.Open();
 
-            string query = "SELECT * FROM BOOKINGS WHERE FLIGHTID = :flightId";
+        //     string query = "SELECT * FROM BOOKINGS WHERE FLIGHTID = :flightId";
 
-            using OracleCommand cmd = new OracleCommand(query, conn);
-            cmd.Parameters.Add(new OracleParameter("flightId", flightId));
+        //     using OracleCommand cmd = new OracleCommand(query, conn);
+        //     cmd.Parameters.Add(new OracleParameter("flightId", flightId));
 
-            using OracleDataReader reader = cmd.ExecuteReader();
+        //     using OracleDataReader reader = cmd.ExecuteReader();
 
-            if (reader.Read())
-            {   
-                string bookingId = reader["BOOKINGID"].ToString()!;
-                DateTime bookingDate = Convert.ToDateTime(reader["BOOKINGDATE"]);
-                BookingStatus status = Enum.Parse<BookingStatus>(reader["STATUS"].ToString()!);
+        //     if (reader.Read())
+        //     {   
+        //         string bookingId = reader["BOOKINGID"].ToString()!;
+        //         DateTime bookingDate = Convert.ToDateTime(reader["BOOKINGDATE"]);
+        //         BookingStatus status = Enum.Parse<BookingStatus>(reader["STATUS"].ToString()!);
 
-                string dbUserId = reader["USERID"].ToString()!;
-                string dbFlightId = reader["FLIGHTID"].ToString()!;
+        //         string dbUserId = reader["USERID"].ToString()!;
+        //         string dbFlightId = reader["FLIGHTID"].ToString()!;
 
-                User customer = userRepository.FindUserById(dbUserId)!;
-                Flight? flight = flightRepository.FindFlightById(dbFlightId);
+        //         User customer = userRepository.FindUserById(dbUserId)!;
+        //         Flight? flight = flightRepository.FindFlightById(dbFlightId);
 
-                return new Booking (
-                    bookingId,
-                    bookingDate,
-                    status,
-                    customer,
-                    flight!
-                );
+        //         return new Booking (
+        //             bookingId,
+        //             bookingDate,
+        //             status,
+        //             customer,
+        //             flight!
+        //         );
                 
-            }
-            return null;
-        }
+        //     }
+        //     return null;
+        // }
 
         public List<Booking> FindBookingsByUserId(string userId)
         {
@@ -128,6 +128,53 @@ namespace FlightBookingSystem.Repository
                 bookings.Add(booking);
                 }   
             }
+            return bookings;
+        }
+
+        public List<Booking> FindCurrentBookingsByUserId(string userId)
+        {
+            List<Booking> bookings = new List<Booking>();
+
+            using OracleConnection conn = dbConnection.GetConnection();
+            conn.Open();
+
+            string query = @"
+                SELECT b.*
+                FROM BOOKINGS b
+                JOIN FLIGHTS f ON b.FLIGHTID = f.FLIGHTID
+                WHERE b.USERID = :userId
+                AND f.DEPARTURE >= SYSTIMESTAMP
+                AND b.STATUS != 'CANCELLED'";
+
+            using OracleCommand cmd = new OracleCommand(query, conn);
+            cmd.Parameters.Add(new OracleParameter("userId", userId));
+
+            using OracleDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                string bookingId = reader["BOOKINGID"].ToString()!;
+                DateTime bookingDate = Convert.ToDateTime(reader["BOOKINGDATE"]);
+                BookingStatus status = Enum.Parse<BookingStatus>(reader["STATUS"].ToString()!);
+
+                string dbUserId = reader["USERID"].ToString()!;
+                string dbFlightId = reader["FLIGHTID"].ToString()!;
+
+                User? customer = userRepository.FindUserById(dbUserId);
+                Flight? flight = flightRepository.FindFlightById(dbFlightId);
+
+                if (customer != null && flight != null)
+                {
+                    bookings.Add(new Booking(
+                        bookingId,
+                        bookingDate,
+                        status,
+                        customer,
+                        flight
+                    ));
+                }
+            }
+
             return bookings;
         }
 
@@ -189,7 +236,7 @@ namespace FlightBookingSystem.Repository
             using OracleCommand cmd = new OracleCommand(query, conn);
 
             cmd.Parameters.Add(new OracleParameter("status", booking.Status.ToString()));
-            cmd.Parameters.Add(new OracleParameter("bookindId", booking.BookingId));
+            cmd.Parameters.Add(new OracleParameter("bookingId", booking.BookingId));
             
             cmd.ExecuteNonQuery();
         }
@@ -215,21 +262,36 @@ namespace FlightBookingSystem.Repository
             cmd.ExecuteNonQuery();
         }
 
-        public bool DeleteBookingByBookingId(string bookingId)
+        // public bool DeleteBookingByBookingId(string bookingId)
+        // {
+        //     using OracleConnection conn = dbConnection.GetConnection();
+        //     conn.Open();
+
+        //     string query = "DELETE FROM BOOKINGS WHERE BOOKINGID = :bookingId";
+
+        //     using OracleCommand cmd = new OracleCommand(query,conn);
+
+        //     cmd.Parameters.Add("bookingId", OracleDbType.Varchar2).Value = bookingId;
+
+        //     int rowsAffected = cmd.ExecuteNonQuery();
+
+        //     return rowsAffected > 0;
+
+        // }
+
+        public bool BookingIdExists(string bookingId)
         {
             using OracleConnection conn = dbConnection.GetConnection();
             conn.Open();
 
-            string query = "DELETE FROM BOOKINGS WHERE BOOKINGID = :bookingId";
+            string query = "SELECT COUNT(*) FROM BOOKINGS WHERE BOOKINGID = :bookingId";
 
-            using OracleCommand cmd = new OracleCommand(query,conn);
+            using OracleCommand cmd = new OracleCommand(query, conn);
+            cmd.Parameters.Add(new OracleParameter("bookingId", bookingId));
 
-            cmd.Parameters.Add("bookingId", OracleDbType.Varchar2).Value = bookingId;
+            int count = Convert.ToInt32(cmd.ExecuteScalar());
 
-            int rowsAffected = cmd.ExecuteNonQuery();
-
-            return rowsAffected > 0;
-
+            return count > 0;
         }
 
     }

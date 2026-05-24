@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using FlightBookingSystem.Model;
 using FlightBookingSystem.Repository;
+using FlightBookingSystem.Utilities;
 
 namespace FlightBookingSystem.Services
 {
@@ -10,11 +11,11 @@ namespace FlightBookingSystem.Services
         private readonly IBookingRepository bookingRepository;
         private readonly IUserRepository userRepository;
         private readonly IFlightRepository flightRepository;
-        public BookingService()
+        public BookingService(IBookingRepository bookingRepository, IUserRepository userRepository, IFlightRepository flightRepository)
         {
-            bookingRepository = new BookingRepository();
-            userRepository = new UserRepository();
-            flightRepository = new FlightRepository();
+            this.bookingRepository = bookingRepository;
+            this.userRepository = userRepository;
+            this.flightRepository = flightRepository;
         }
 
 
@@ -55,9 +56,22 @@ namespace FlightBookingSystem.Services
                 return null;
             }
 
+            List<Booking> existingBookings = bookingRepository.FindBookingsByUserId(userId);
+
+            foreach(Booking booking in existingBookings)
+            {
+                if(booking.Flight.FlightId == flightId && booking.Status != BookingStatus.CANCELLED)
+                {
+                    Console.WriteLine("\nYou already booked this flight.");
+                    return null;
+                }
+            }
+
+            string bookingId = GenerateUniqueBookingId();
+
             // creates new booking
             Booking newBooking = new Booking(
-                Guid.NewGuid().ToString(),
+                bookingId,
                 DateTime.Now,
                 BookingStatus.CONFIRMED,
                 user,
@@ -119,6 +133,17 @@ namespace FlightBookingSystem.Services
 
             return bookingRepository.FindBookingsByUserId(userId); // if the user exists the service asks repo to retrieve all existing bookings.
         }
+        public List<Booking> GetCurrentBookingsByUserId(string userId)
+        {
+            User? user = userRepository.FindUserById(userId);
+
+            if (user == null)
+            {
+                return new List<Booking>();
+            }
+
+            return bookingRepository.FindCurrentBookingsByUserId(userId);
+        }
         public List<Booking> GetBookingHistory(string userId)
         {
             User? user = userRepository.FindUserById(userId); // checks if the user exists
@@ -129,6 +154,19 @@ namespace FlightBookingSystem.Services
             }
 
             return bookingRepository.FindPastBookingsByUserId(userId); // if the user exists the services asks repo to retrieve past bookigns.
+        }
+
+        public string GenerateUniqueBookingId()
+        {
+            string bookingId;
+
+            do
+            {
+                bookingId = IdGenerator.GenerateBookingId();
+            }
+            while (bookingRepository.BookingIdExists(bookingId));
+
+            return bookingId;
         }
     }
 }

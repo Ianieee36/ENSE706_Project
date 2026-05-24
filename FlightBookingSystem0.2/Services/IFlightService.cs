@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using FlightBookingSystem.Model;
+using FlightBookingSystem.Repository;
+using FlightBookingSystem.Utilities;
 
 namespace FlightBookingSystem.Services
 {
@@ -12,5 +14,8 @@ namespace FlightBookingSystem.Services
         void RemoveFlightById(string flightId);
         List<Flight> GetAllFlights();
         int GetFlightOccupancy(string flightId);
+
+        string GenerateUniqueFlightId();
+        
     }
 }

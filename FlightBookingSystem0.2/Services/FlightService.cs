@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using FlightBookingSystem.Model;
 using FlightBookingSystem.Repository;
+using FlightBookingSystem.Utilities;
 
 namespace FlightBookingSystem.Services
 {
@@ -9,9 +10,9 @@ namespace FlightBookingSystem.Services
     {
         private readonly IFlightRepository flightRepository;
 
-        public FlightService()
+        public FlightService(IFlightRepository flightRepository)
         {
-            flightRepository = new FlightRepository();
+            this.flightRepository = flightRepository;
         }
 
         public List<Flight> SearchFlights(string origin, string destination)
@@ -35,7 +36,7 @@ namespace FlightBookingSystem.Services
         {
             if(flight.DepartureDateTime <= DateTime.Now)
             {
-                throw new ArgumentException("Departure date must be in the present");
+                throw new ArgumentException("Departure date must be in the future");
             }
 
             if(flight.TotalSeats <= 0)
@@ -43,13 +44,24 @@ namespace FlightBookingSystem.Services
                 throw new ArgumentException("Total seats must be greater than zero");
             }
 
-            flightRepository.SaveFlight(flight);
+            string flightId = GenerateUniqueFlightId();
+
+            Flight newFlight = new Flight(
+                flightId,
+                flight.Origin,
+                flight.Destination,
+                flight.DepartureDateTime,
+                flight.TotalSeats
+            );
+
+            flightRepository.SaveFlight(newFlight);
         }
 
         public void UpdateFlight(Flight flight)
         {
             flightRepository.UpdateFlight(flight);
         }
+        
         public void RemoveFlightById(string flightId)
         {
             Flight? flight = flightRepository.FindFlightById(flightId);
@@ -78,5 +90,19 @@ namespace FlightBookingSystem.Services
 
             return flight.TotalSeats - flight.AvailableSeats;
         }
+
+        public string GenerateUniqueFlightId()
+        {
+            string flightId;
+
+            do
+            {
+                flightId = IdGenerator.GenerateFlightId();
+            }
+            while (flightRepository.FlightIdExists(flightId));
+
+            return flightId;
+        }
+        
     }
 }
