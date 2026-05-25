@@ -1,15 +1,29 @@
-using System;
 using Oracle.ManagedDataAccess.Client;
 
 namespace FlightBookingSystem.Repository
 {
-    public class DatabaseConnection
+    public sealed class DatabaseConnection
     {
-        private string connectionString;
+        private static DatabaseConnection? instance; // Singleton Pattern
+        private readonly string connectionString;
 
-        public DatabaseConnection()
+        // Private constructor prevents external instantiation
+        private DatabaseConnection()
         {
             connectionString = "User Id=system;Password=1234;Data Source=localhost:1521/XE;";
+        }
+
+        // Global access point
+        public static DatabaseConnection Instance
+        {
+            get
+            {
+                if(instance == null)
+                {
+                    instance = new DatabaseConnection();
+                }
+                return instance;
+            }
         }
 
         public OracleConnection GetConnection()
