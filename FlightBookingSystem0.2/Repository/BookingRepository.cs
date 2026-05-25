@@ -9,18 +9,16 @@ namespace FlightBookingSystem.Repository
     {
         private readonly IUserRepository userRepository;
         private readonly IFlightRepository flightRepository;
-        private readonly DatabaseConnection dbConnection;
-
+    
         public BookingRepository(IUserRepository userRepository, IFlightRepository flightRepository, DatabaseConnection dbConnection)
         {
             this.userRepository = userRepository;
             this.flightRepository = flightRepository;
-            this.dbConnection = dbConnection;
         }
 
         public Booking? FindBookingById(string bookingId)
         {
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
             string query = "SELECT * FROM BOOKINGS WHERE BOOKINGID = :bookingId";
@@ -93,7 +91,7 @@ namespace FlightBookingSystem.Repository
         {
             List<Booking> bookings = new List<Booking>();
 
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
             string query = "SELECT * FROM BOOKINGS WHERE USERID = :userId";
@@ -135,7 +133,7 @@ namespace FlightBookingSystem.Repository
         {
             List<Booking> bookings = new List<Booking>();
 
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
             string query = @"
@@ -182,7 +180,7 @@ namespace FlightBookingSystem.Repository
         {
             List<Booking> bookings = new List<Booking>();
 
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
             string query = @"
@@ -228,7 +226,7 @@ namespace FlightBookingSystem.Repository
 
         public void UpdateBooking(Booking booking)
         {
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
             string query = "UPDATE BOOKINGS SET STATUS = :status WHERE BOOKINGID = :bookingId";
@@ -243,7 +241,7 @@ namespace FlightBookingSystem.Repository
 
         public void SaveBooking(Booking bookings)
         {
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
             string query = @"INSERT INTO BOOKINGS 
@@ -281,7 +279,7 @@ namespace FlightBookingSystem.Repository
 
         public bool BookingIdExists(string bookingId)
         {
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
             string query = "SELECT COUNT(*) FROM BOOKINGS WHERE BOOKINGID = :bookingId";

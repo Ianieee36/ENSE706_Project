@@ -2,13 +2,12 @@ using System;
 
 namespace FlightBookingSystem.Model
 {
-    public class User
+    public abstract class User
     {
         // private fields (attributes)
         private string userId;
         private string email;
         private string passwordHash;
-        private Role role;
         private string firstName;
         private string lastName;
         private DateTime dateOfBirth;
@@ -16,13 +15,12 @@ namespace FlightBookingSystem.Model
         private string phoneNumber;
 
         // User constructor 
-        public User(string userId, string email, string passwordHash, Role role, string firstName, string lastName, 
+        public User(string userId, string email, string passwordHash, string firstName, string lastName, 
                    DateTime dateOfBirth, string address, string phoneNumber)
         {
             this.userId = userId;
             this.email = email;
             this.passwordHash = passwordHash;
-            this.role = role;
             this.firstName = firstName;
             this.lastName = lastName;
             this.dateOfBirth = dateOfBirth;
@@ -47,12 +45,6 @@ namespace FlightBookingSystem.Model
         {
             get{return passwordHash;}    
             private set{passwordHash = value;}
-        }
-
-        public Role UserRole
-        {
-            get {return role;}
-            private set{role = value;}    
         }
 
         public string FirstName

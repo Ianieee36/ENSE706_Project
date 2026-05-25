@@ -6,15 +6,9 @@ namespace FlightBookingSystem.Repository
 {
     internal class UserRepository : IUserRepository
     {
-        private readonly DatabaseConnection dbConnection;
-        public UserRepository(DatabaseConnection dbConnection)
-        {
-            this.dbConnection = dbConnection;
-        }
-
         public User? FindUserById(string userId)
         {
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
             string query = "SELECT * FROM USERS WHERE USERID = :userId";
@@ -44,7 +38,7 @@ namespace FlightBookingSystem.Repository
         }
         public User? FindUserByEmail(string email)
         {
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
             string query = "SELECT * FROM USERS WHERE EMAIL = :email";
@@ -76,7 +70,7 @@ namespace FlightBookingSystem.Repository
 
         public void SaveUser(User user)
         {
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
             string query = @"INSERT INTO USERS (USERID, EMAIL, PASSWORDHASH, ROLE, FIRSTNAME, LASTNAME, DATEOFBIRTH, ADDRESS, PHONENUMBER) 
@@ -99,7 +93,7 @@ namespace FlightBookingSystem.Repository
 
         public bool EmailExists(string email)
         {
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
             string query = "SELECT 1 FROM USERS WHERE EMAIL = :email FETCH FIRST 1 ROWS ONLY";
@@ -115,7 +109,7 @@ namespace FlightBookingSystem.Repository
 
         public bool UserIdExists(string userId)
         {
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
             string query = "SELECT COUNT(*) FROM USERS WHERE USERID = :userId";

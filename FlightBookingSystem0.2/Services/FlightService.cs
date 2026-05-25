@@ -71,7 +71,7 @@ namespace FlightBookingSystem.Services
                 throw new ArgumentException("Flight not found");
             }
 
-            flightRepository.DeleteFlightByFlightId(flightId);
+            flightRepository.DeleteFlightById(flightId);
         }
         
         public List<Flight> GetAllFlights()

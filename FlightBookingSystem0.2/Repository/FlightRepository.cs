@@ -5,19 +5,13 @@ namespace FlightBookingSystem.Repository
 {
     internal class FlightRepository : IFlightRepository
     {
-        private readonly DatabaseConnection dbConnection;
-
-        public FlightRepository(DatabaseConnection dbConnection)
-        {
-            this.dbConnection = dbConnection;
-        }
-        
-        // Retrieves list of flights from DB
+    
+         // Retrieves list of flights from DB
         public List<Flight> FindAllFlights()
         { 
             List<Flight> flights = new List<Flight>(); // create an emptylist
 
-            using OracleConnection conn = dbConnection.GetConnection(); // database connection
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection(); // database connection
             conn.Open(); // open connection
 
             string query = "SELECT * FROM FLIGHTS"; // SQL query
@@ -57,7 +51,7 @@ namespace FlightBookingSystem.Repository
         public List<Flight> FindFlightsByRoute(string origin, string destination)
         {
             List<Flight> flights = new List<Flight>();
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
             string query = @"SELECT * FROM FLIGHTS
@@ -101,7 +95,7 @@ namespace FlightBookingSystem.Repository
         // Finds Flight by flighID
         public Flight? FindFlightById(string flightId)
         {
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
 
@@ -141,7 +135,7 @@ namespace FlightBookingSystem.Repository
         // Saves Flight to DB
         public void SaveFlight(Flight flight)
         {
-            using OracleConnection conn = dbConnection.GetConnection(); // database connection
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection(); // database connection
             conn.Open();
 
             string query = @"INSERT INTO FLIGHTS 
@@ -167,7 +161,7 @@ namespace FlightBookingSystem.Repository
         // Update Flight Information
         public void UpdateFlight(Flight flight)
         {
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
             string query = @"
@@ -197,7 +191,7 @@ namespace FlightBookingSystem.Repository
         // Deletes Flight from DB by flight id
         public bool DeleteFlightById(string flightId)
         {
-           using OracleConnection conn = dbConnection.GetConnection();
+           using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
            conn.Open();
 
            string query = "DELETE FROM FLIGHTS WHERE FLIGHTID = :flightId";
@@ -216,7 +210,7 @@ namespace FlightBookingSystem.Repository
 
         public bool FlightIdExists(string flightId)
         {
-            using OracleConnection conn = dbConnection.GetConnection();
+            using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
             string query = "SELECT COUNT(*) FROM FLIGHTS WHERE FLIGHTID = :flightId";
