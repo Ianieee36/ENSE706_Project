@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using FlightBookingSystem.Model;
 using FlightBookingSystem.Repository;
 using FlightBookingSystem.Utilities;
@@ -32,16 +30,46 @@ namespace FlightBookingSystem.Services
             return flight;
         }
 
-        public void AddFlight(Flight flight)
+        public void AddFlight(Admin admin, Flight flight)
         {
-            if(flight.DepartureDateTime <= DateTime.Now)
+            if (admin == null)
             {
-                throw new ArgumentException("Departure date must be in the future");
+                throw new ArgumentException("Admin cannot be null.");
             }
 
-            if(flight.TotalSeats <= 0)
+            if (!admin.CanAddFlight())
             {
-                throw new ArgumentException("Total seats must be greater than zero");
+                throw new Exception("You do not have permission to add a flight.");
+            }
+
+            if (flight == null)
+            {
+                throw new ArgumentException("Flight cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(flight.Origin))
+            {
+                throw new ArgumentException("Origin cannot be empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(flight.Destination))
+            {
+                throw new ArgumentException("Destination cannot be empty.");
+            }
+
+            if (flight.Origin.Equals(flight.Destination, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException("Origin and destination cannot be the same.");
+            }
+
+            if (flight.DepartureDateTime <= DateTime.Now)
+            {
+                throw new ArgumentException("Departure date must be in the future.");
+            }
+
+            if (flight.TotalSeats <= 0)
+            {
+                throw new ArgumentException("Total seats must be greater than zero.");
             }
 
             string flightId = GenerateUniqueFlightId();
@@ -57,13 +85,64 @@ namespace FlightBookingSystem.Services
             flightRepository.SaveFlight(newFlight);
         }
 
-        public void UpdateFlight(Flight flight)
+        public void UpdateFlight(Admin admin, Flight flight)
         {
+            if(admin == null)
+            {
+                throw new Exception("Admin cannot be null");
+            }
+
+            if(!admin.CanUpdateFlight())
+            {
+                throw new Exception("You do not have permission to update a flight.");
+            }
+
+            if (flight == null)
+            {
+                throw new ArgumentException("Flight cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(flight.Origin))
+            {
+                throw new ArgumentException("Origin cannot be empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(flight.Destination))
+            {
+                throw new ArgumentException("Destination cannot be empty.");
+            }
+
+            if (flight.Origin.Equals(flight.Destination, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException("Origin and destination cannot be the same.");
+            }
+
+            if (flight.DepartureDateTime <= DateTime.Now)
+            {
+                throw new ArgumentException("Departure date must be in the future.");
+            }
+
+            if (flight.TotalSeats <= 0)
+            {
+                throw new ArgumentException("Total seats must be greater than zero.");
+            }
+
+
             flightRepository.UpdateFlight(flight);
         }
         
-        public void RemoveFlightById(string flightId)
+        public void RemoveFlightById(Admin admin, string flightId)
         {
+            if(admin == null)
+            {
+                throw new Exception("Admin cannot be null");
+            }
+
+            if(!admin.CanDeleteFlight())
+            {
+                throw new Exception("You do not have permission to remove a flight.");
+            }
+
             Flight? flight = flightRepository.FindFlightById(flightId);
 
             if(flight == null)
@@ -75,7 +154,7 @@ namespace FlightBookingSystem.Services
         }
         
         public List<Flight> GetAllFlights()
-        {
+        {   
             return flightRepository.FindAllFlights();
         }
 
@@ -91,7 +170,7 @@ namespace FlightBookingSystem.Services
             return flight.TotalSeats - flight.AvailableSeats;
         }
 
-        public string GenerateUniqueFlightId()
+        private string GenerateUniqueFlightId()
         {
             string flightId;
 

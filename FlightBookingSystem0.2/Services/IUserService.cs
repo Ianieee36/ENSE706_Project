@@ -6,8 +6,21 @@ namespace FlightBookingSystem.Services
     public interface IUserService
     {
         User? Login(string email, string password);
-        User? Register(User user);
+        Customer? RegisterCustomer(Customer customer);
+        Admin? RegisterAdmin(Admin currentAdmin, Admin admin);
         User? Logout();
-        string GenerateUniqueUserId();
+
+        bool UpdateProfile(User user,
+                                  string? email = null,
+                                  string? firstName = null,
+                                  string? lastName = null,
+                                  string? address = null,
+                                  string? phoneNumber = null);
+
+        bool ChangePassword(string userId, string oldPassword, string newPassword);
+
+        User? GetUserById(string userId);
+
+
     }
 }
