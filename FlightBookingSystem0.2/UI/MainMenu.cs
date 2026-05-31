@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
 using FlightBookingSystem.Utilities;
 using FlightBookingSystem.Model;
 using FlightBookingSystem.Services;
@@ -58,7 +55,7 @@ namespace FlightBookingSystem.UI
                         break;
 
                     case "3":
-                        HandleRegister();
+                        HandleRegisterCustomer();
                         break;
 
                     case "4":
@@ -98,13 +95,13 @@ namespace FlightBookingSystem.UI
                 }
 
                 // checks if the user is customer or admin
-                if(user.UserRole is Role.CUSTOMER)
+                if(user is Customer customer)
                 {
-                    customerMenu.DisplayCustomerMenu(user);
+                    customerMenu.DisplayCustomerMenu(customer);
                 }
-                else if(user.UserRole is Role.ADMIN)
+                else if(user is Admin admin)
                 {
-                    adminMenu.DisplayAdminMenu(user);
+                    adminMenu.DisplayAdminMenu(admin);
                 }
 
                 return user;
@@ -112,7 +109,7 @@ namespace FlightBookingSystem.UI
             
         }
 
-        public User? HandleRegister()
+        public User? HandleRegisterCustomer()
         {   
             Console.Clear();
 
@@ -128,20 +125,21 @@ namespace FlightBookingSystem.UI
             string hashedPassword = PasswordHasher.HashPassword(password);
 
             // creates new customer
-            User? newCustomer = new User(
+            Customer? newCustomer = new Customer(
                 "",
                 email,
                 hashedPassword,
-                Role.CUSTOMER,
                 firstName,
                 lastName,
                 dob,
                 address,
-                phoneNumber
+                phoneNumber,
+                0,
+                MembershipTier.BRONZE
             );
 
             // registers customer and saves it to database
-            User? customer = userService.Register(newCustomer);
+            Customer? customer = userService.RegisterCustomer(newCustomer);
 
             // check if the registered customer already existed
             if(customer == null)
@@ -153,7 +151,7 @@ namespace FlightBookingSystem.UI
 
                 Console.WriteLine("Registration successful.");
                 inputHelper.Pause();
-                return newCustomer;
+                return customer;
         }
             
         

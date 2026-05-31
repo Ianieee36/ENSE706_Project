@@ -8,16 +8,21 @@ namespace FlightBookingSystem.UI
     {
         private readonly IFlightService flightService;
         private readonly IBookingService bookingService;
+        private readonly ITicketService ticketService;
+        private readonly IUserService userService;
         private readonly InputHelper inputHelper;
 
-        public CustomerMenu(IFlightService flightService, IBookingService bookingService, InputHelper inputHelper)
+        public CustomerMenu(IFlightService flightService, IBookingService bookingService, 
+                            ITicketService ticketService, IUserService userService, InputHelper inputHelper)
         {
             this.flightService = flightService;
             this.bookingService = bookingService;
+            this.ticketService = ticketService;
+            this.userService = userService;
             this.inputHelper = inputHelper;
         }
 
-        public void DisplayCustomerMenu(User customer)
+        public void DisplayCustomerMenu(Customer customer)
         {
             bool logout = false;
 
@@ -25,13 +30,18 @@ namespace FlightBookingSystem.UI
             {
                 Console.Clear();
 
-                Console.WriteLine("===== Air New Zealand =====");
-                Console.WriteLine("===== We fly for you =====");
-                Console.WriteLine($"\n==== Welcome, {customer.FirstName} ====");
+                Console.WriteLine("=============================");
+                Console.WriteLine("====== Air New Zealand ======");
+                Console.WriteLine("====== We fly for you  ======");
+                Console.WriteLine("=============================");
+                Console.WriteLine($"\n==== Welcome, {customer.FirstName} =====");
+                Console.WriteLine($"=== Airpoints: {customer.LoyaltyPoints} : {customer.MembershipTier} ===");
+                Console.WriteLine("=============================");
                 Console.WriteLine("1. Search Flights");
                 Console.WriteLine("2. Manage my bookings");
                 Console.WriteLine("3. View Booking History");
-                Console.WriteLine("4. Logout");
+                Console.WriteLine("4. Manage Account");
+                Console.WriteLine("5. Logout");
                 Console.Write("Select option: ");
 
                 string? choice = Console.ReadLine();
@@ -51,6 +61,10 @@ namespace FlightBookingSystem.UI
                         break;
 
                     case "4":
+                        HandleManageAccount(customer);
+                        break;
+
+                    case "5":
                         logout = true;
                         break;
 
@@ -61,7 +75,7 @@ namespace FlightBookingSystem.UI
             }
         }
 
-        private void HandleSearchFlights(User currentUser)
+        private void HandleSearchFlights(Customer currentUser)
         {
             while (true)
             {
@@ -137,7 +151,8 @@ namespace FlightBookingSystem.UI
         }
 
         public void HandleViewFlightDetails()
-        {   
+        {       
+                Console.WriteLine("\n");
                 Console.Write("Enter flight id: ");
                 string? flightId = Console.ReadLine()!.ToUpper();
 
@@ -169,42 +184,58 @@ namespace FlightBookingSystem.UI
                 inputHelper.Pause();
         }
 
-        private void HandleBookFlight(User currentUser)
+        private void HandleBookFlight(Customer currentUser)
         {
-            while (true)
+            try
             {
                 Console.Write("\nEnter Flight ID to book, or B to go back: ");
-                string flightId = Console.ReadLine()!.ToUpper();
+                string? flightId = Console.ReadLine();
 
-                if(flightId == "B")
+                if (string.IsNullOrWhiteSpace(flightId))
+                {
+                    Console.WriteLine("Flight ID is required.");
+                    inputHelper.Pause();
+                    return;
+                }
+
+                flightId = flightId.ToUpper();
+
+                if (flightId == "B")
                 {
                     return;
                 }
 
-                if(string.IsNullOrWhiteSpace(flightId))
-                {
-                    Console.WriteLine("Flight ID is required.");
-                    continue;
-                }
-
                 Booking? booking = bookingService.BookFlight(currentUser.UserId, flightId);
 
-                if(booking == null)
+                if (booking == null)
                 {
-                    continue;
-
+                    Console.WriteLine("Booking failed.");
+                    inputHelper.Pause();
+                    return;
                 }
-               
+
+                User? refreshedUser = userService.GetUserById(currentUser.UserId);
+
+                if (refreshedUser is Customer refreshedCustomer)
+                {
+                    currentUser.UpdateLoyaltyInfo(
+                        refreshedCustomer.LoyaltyPoints,
+                        refreshedCustomer.MembershipTier
+                    );
+                }
+
                 Console.WriteLine("\nBooking successful!");
                 Console.WriteLine($"Booking ID: {booking.BookingId}");
-                
-                inputHelper.Pause();
-                return;
             }
-            
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error: {e.Message}");
+            }
+
+            inputHelper.Pause();
         }
 
-        private void HandleManageBooking(User currentUser)
+        private void HandleManageBooking(Customer currentUser)
         {
             while(true)
             {
@@ -224,40 +255,48 @@ namespace FlightBookingSystem.UI
 
                 foreach (Booking booking in bookings)
                 {
-                    Console.WriteLine(
-                        $"Booking ID: {booking.BookingId}"
-                    );
+                    if (booking.IsActive())
+                    {
+                        Console.WriteLine(
+                            $"Booking ID: {booking.BookingId}"
+                        );
 
-                    Console.WriteLine(
-                        $"{booking.Flight.Origin} -> " +
-                        $"{booking.Flight.Destination}"
-                    );
+                        Console.WriteLine(
+                            $"{booking.Flight.Origin} -> " +
+                            $"{booking.Flight.Destination}"
+                        );
 
-                    Console.WriteLine(
-                        $"Departure: " +
-                        $"{booking.Flight.DepartureDateTime:dd/MM/yyyy hh:mm tt}"
-                    );
+                        Console.WriteLine(
+                            $"Departure: " +
+                            $"{booking.Flight.DepartureDateTime:dd/MM/yyyy hh:mm tt}"
+                        );
 
-                    Console.WriteLine(
-                        $"Status: {booking.Status}"
-                    );
+                        Console.WriteLine(
+                            $"Status: {booking.BookingStatus}"
+                        );
 
-                    Console.WriteLine("--------------------------");
+                        Console.WriteLine("\n----------------------------");   
+                    }
                 }
 
-                Console.WriteLine("\n1. Cancel Booking");
-                Console.WriteLine("2. Back to menu");
+                Console.WriteLine("\n1. View Ticket");
+                Console.WriteLine("2. Cancel Booking");
+                Console.WriteLine("3. Back to menu");
                 Console.Write("Select option: ");
 
                 string? choice = Console.ReadLine();
 
                 switch(choice)
-                {
+                {   
                     case "1":
-                        HandleCancelBooking(currentUser);
+                        HandleViewTicket();
                         break;
 
                     case "2":
+                        HandleCancelBooking(currentUser);
+                        break;
+
+                    case "3":
                         return;
 
                     default:
@@ -267,32 +306,50 @@ namespace FlightBookingSystem.UI
             }
         }
 
-        private void HandleCancelBooking(User currentUser) 
+        private void HandleCancelBooking(Customer currentUser) 
         {
-            Console.Write("Enter booking ID to cancel: ");
-            string bookingId = Console.ReadLine()!;
 
-            if(string.IsNullOrWhiteSpace(bookingId))
+            try
             {
-                Console.WriteLine("Booking ID is required");
-                return;
+                Console.Write("Enter booking ID to cancel: ");
+                string bookingId = Console.ReadLine()!;
+
+                if(string.IsNullOrWhiteSpace(bookingId))
+                {
+                    Console.WriteLine("Booking ID is required");
+                    return;
+                }
+
+                Booking booking = bookingService.GetBookingById(bookingId)!;
+
+                if(booking == null)
+                {
+                    Console.WriteLine("Booking not found");
+                    inputHelper.Pause();
+                    return;
+                }
+
+                bool cancelled = bookingService.CancelBookingById(booking, currentUser.UserId);
+
+                if(cancelled)
+                {
+                    Console.WriteLine("Booking cancelled successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("Booking cancellation failed.");
+                }
+
             }
-
-            bool cancelled = bookingService.CancelBookingById(bookingId, currentUser.UserId);
-
-            if(cancelled)
+            catch(Exception e)
             {
-                Console.WriteLine("Booking cancelled successfully.");
+                Console.WriteLine($"Error: {e.Message}");
             }
-            else
-            {
-                Console.WriteLine("Booking cancellation failed.");
-            }
-
+            
             inputHelper.Pause();
         }
 
-        private void HandleViewBookingHistory(User currentUser)
+        private void HandleViewBookingHistory(Customer currentUser)
         {
             Console.Clear();
 
@@ -317,6 +374,207 @@ namespace FlightBookingSystem.UI
             }
 
             inputHelper.Pause();
+        }
+
+        private void HandleViewTicket()
+        {
+            Console.WriteLine("\n");
+
+            try
+            {
+                Console.Write("Enter Booking ID: ");
+                string bookingId = Console.ReadLine()!.ToUpper();
+
+                Console.Clear();
+
+                if (string.IsNullOrWhiteSpace(bookingId))
+                {
+                    Console.WriteLine("Booking ID is required");
+                }
+
+                Ticket? bookingTicket = ticketService.GetTicketByBookingId(bookingId);
+
+                if(bookingTicket == null)
+                {
+                    Console.WriteLine("Ticket has not been issued");
+                    inputHelper.Pause();
+                    return;
+                }
+                
+                Console.Clear();
+                Console.WriteLine("\n======== Ticket Details ========");
+                Console.WriteLine($"Passenger Name: {bookingTicket.Booking.Customer.FullName}");
+                Console.WriteLine($"Flight: {bookingTicket.Booking.Flight.FlightId}");
+                Console.WriteLine($"Date: {bookingTicket.IssueDate: dd/MM}");
+                Console.WriteLine($"Time: {bookingTicket.BoardingTime: HH:mm}");
+                Console.WriteLine($"Gate Number: {bookingTicket.GateNumber}");
+                Console.WriteLine($"Seat Number: {bookingTicket.SeatNumber}");
+                Console.WriteLine("===================================");    
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error: {e.Message}");
+            }
+            inputHelper.Pause();
+        }
+
+        public void HandleManageAccount(Customer customer)
+        {
+            Console.Clear();
+
+            Console.WriteLine("\n====== Manage Account ======");
+            Console.WriteLine("1. Update Profile Information");
+            Console.WriteLine("2. Change Password");
+            Console.WriteLine("3. Back");
+            Console.Write("Select options: ");
+            
+            string? choice = Console.ReadLine();
+
+            switch(choice)
+            {
+                case "1":
+                    HandleUpdateProfile(customer);
+                    break;
+                
+                case "2":
+                    HandleChangePassword(customer);
+                    break;
+                
+                case "3":
+                    return;
+                
+                default:
+                    Console.WriteLine("Invalid options");
+                    break;
+            }
         } 
+
+        public void HandleUpdateProfile(Customer currentCustomer)
+        {
+            Console.Clear();
+
+            Console.WriteLine("\n======= Update Profile =======");
+            Console.WriteLine("1. Change email");
+            Console.WriteLine("2. Change first name");
+            Console.WriteLine("3. Change last name");
+            Console.WriteLine("4. Change address");
+            Console.WriteLine("5. Change phone number");
+            Console.WriteLine("6. Back");
+
+            int choice = inputHelper.ReadPositiveInt("choice");
+
+            try
+            {
+                switch(choice)
+                {
+                    case 1:
+                    {
+                        string email = inputHelper.ReadRequiredInput("new email");
+
+                        userService.UpdateProfile(currentCustomer, email: email);
+
+                        Console.WriteLine("Email updated successfully.");
+                        break;
+                    }
+
+                    case 2:
+                    {
+                        string firstName = inputHelper.ReadRequiredInput("new first name");
+
+                        userService.UpdateProfile(currentCustomer, firstName: firstName);
+
+                        Console.WriteLine("First name updated successfully.");
+                        break;
+                    }
+
+                    case 3:
+                    {
+                        string lastName = inputHelper.ReadRequiredInput("new last name");
+
+                        userService.UpdateProfile(currentCustomer, lastName: lastName);
+
+                        Console.WriteLine("Last name updated successfully.");
+                        break;           
+                    }
+
+                    case 4:
+                    {
+                        string address = inputHelper.ReadRequiredInput("new address");
+
+                        userService.UpdateProfile(currentCustomer, address: address);
+
+                        Console.WriteLine("Address updated successfully.");
+                        break;           
+                    }
+
+                    case 5:
+                    {
+                        string phoneNumber = inputHelper.ReadRequiredInput("new phone number");
+
+                        userService.UpdateProfile(currentCustomer, phoneNumber: phoneNumber);
+
+                        Console.WriteLine("Phone number updated successfully.");
+                        break;           
+                    }
+
+                    case 6:
+                        return;
+
+                    default:
+                        Console.WriteLine("Invalid option");
+                        break;            
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error: {e.Message}");
+            }
+
+            inputHelper.Pause();
+        }
+
+        public void HandleChangePassword(Customer currentCustomer)
+        {
+            Console.Clear();
+
+            try
+            {
+                Console.WriteLine("\n========= Change Password ===========");
+
+                string oldPassword = inputHelper.ReadRequiredInput("current password");
+
+                string newPassword = inputHelper.ReadRequiredInput("new password");
+
+                string confirmPassword = inputHelper.ReadRequiredInput("confirm password");
+
+                if(newPassword != confirmPassword)
+                {
+                    Console.WriteLine("Password do not match.");
+                    inputHelper.Pause();
+                    return;
+                }
+
+                bool changed = userService.ChangePassword(
+                    currentCustomer.UserId,
+                    oldPassword,
+                    newPassword
+                );
+
+                if(changed)
+                {
+                    Console.WriteLine("Password changed successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("Password change failed.");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error: {e.Message}");
+            }
+
+            inputHelper.Pause();
+        }
     }
 }
