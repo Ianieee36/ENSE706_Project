@@ -42,3 +42,64 @@ CREATE TABLE BOOKINGS (
     CONSTRAINT fk_bookings_flights
         FOREIGN KEY (FlightId) REFERENCES FLIGHTS(FlightId)
 );
+
+CREATE TABLE TICKETS (
+    TicketId VARCHAR2(50) PRIMARY KEY,
+    TicketNumber VARCHAR2(50) NOT NULL UNIQUE,
+    IssueDate TIMESTAMP NOT NULL,
+    SeatNumber VARCHAR2(20) NOT NULL,
+    GateNumber VARCHAR2(20) NOT NULL,
+    BoardingTime TIMESTAMP NOT NULL,
+    TicketStatus VARCHAR2(50) NOT NULL,
+    BookingId VARCHAR2(50) NOT NULL UNIQUE,
+
+    CONSTRAINT chk_ticket_status
+        CHECK (TicketStatus IN ('ISSUED', 'USED', 'CANCELLED', 'EXPIRED')),
+
+    CONSTRAINT fk_tickets_bookings
+        FOREIGN KEY (BookingId) REFERENCES BOOKINGS(BookingId)
+);
+
+ALTER TABLE USERS
+DROP CONSTRAINT CHK_USER_ROLE;
+
+ALTER TABLE USERS
+DROP COLUMN Role;
+
+CREATE TABLE CUSTOMERS (
+    UserId VARCHAR2(50) PRIMARY KEY,
+    LoyaltyPoints NUMBER DEFAULT 0 NOT NULL,
+    MembershipTier VARCHAR2(50) DEFAULT 'BRONZE' NOT NULL,
+
+    CONSTRAINT chk_membership_tier
+        CHECK (
+            MembershipTier IN (
+                    'BRONZE',
+                    'SILVER',
+                    'GOLD'
+            )
+        ),
+
+    CONSTRAINT fk_customers_users
+        FOREIGN KEY (UserId)
+        REFERENCES USERS(UserId)
+);
+
+CREATE TABLE ADMINS (
+    UserId VARCHAR2(50) PRIMARY KEY,
+    AdminLevel VARCHAR2(50) NOT NULL,
+
+    CONSTRAINT chk_admin_level
+        CHECK (
+            AdminLevel IN (
+                'SUPPORT_ADMIN',
+                'FLIGHT_MANAGER',
+                'SYSTEM_ADMIN'
+            )
+        ),
+
+    CONSTRAINT fk_admins_users
+        FOREIGN KEY (UserId)
+        REFERENCES USERS(UserId)
+);
+

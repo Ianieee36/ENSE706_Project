@@ -9,10 +9,10 @@ namespace FlightBookingSystem.Repository
         Booking? FindBookingById(string bookingId);
         // Booking? FindBookingByFlightId(string flightId);
 
-        List<Booking> FindBookingsByUserId(string userId);
-        List<Booking> FindCurrentBookingsByUserId(string userId);
+        List<Booking> FindBookingsByCustomerId(string customerId);
+        List<Booking> FindCurrentBookingsByCustomerId(string customerId);
 
-        List<Booking> FindPastBookingsByUserId(string userId);
+        List<Booking> FindPastBookingsByCustomerId(string customerId);
 
         void UpdateBooking(Booking booking);
         void SaveBooking(Booking bookings);

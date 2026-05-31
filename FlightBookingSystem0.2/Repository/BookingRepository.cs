@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using FlightBookingSystem.Model;
 using Oracle.ManagedDataAccess.Client;
 
@@ -10,7 +8,7 @@ namespace FlightBookingSystem.Repository
         private readonly IUserRepository userRepository;
         private readonly IFlightRepository flightRepository;
     
-        public BookingRepository(IUserRepository userRepository, IFlightRepository flightRepository, DatabaseConnection dbConnection)
+        public BookingRepository(IUserRepository userRepository, IFlightRepository flightRepository)
         {
             this.userRepository = userRepository;
             this.flightRepository = flightRepository;
@@ -87,7 +85,7 @@ namespace FlightBookingSystem.Repository
         //     return null;
         // }
 
-        public List<Booking> FindBookingsByUserId(string userId)
+        public List<Booking> FindBookingsByCustomerId(string customerId)
         {
             List<Booking> bookings = new List<Booking>();
 
@@ -97,7 +95,7 @@ namespace FlightBookingSystem.Repository
             string query = "SELECT * FROM BOOKINGS WHERE USERID = :userId";
 
             using OracleCommand cmd = new OracleCommand(query, conn);
-            cmd.Parameters.Add(new OracleParameter("userId", userId));
+            cmd.Parameters.Add(new OracleParameter("userId", customerId));
 
             using OracleDataReader reader = cmd.ExecuteReader();
 
@@ -129,7 +127,7 @@ namespace FlightBookingSystem.Repository
             return bookings;
         }
 
-        public List<Booking> FindCurrentBookingsByUserId(string userId)
+        public List<Booking> FindCurrentBookingsByCustomerId(string customerId)
         {
             List<Booking> bookings = new List<Booking>();
 
@@ -145,7 +143,7 @@ namespace FlightBookingSystem.Repository
                 AND b.STATUS != 'CANCELLED'";
 
             using OracleCommand cmd = new OracleCommand(query, conn);
-            cmd.Parameters.Add(new OracleParameter("userId", userId));
+            cmd.Parameters.Add(new OracleParameter("userId", customerId));
 
             using OracleDataReader reader = cmd.ExecuteReader();
 
@@ -176,7 +174,7 @@ namespace FlightBookingSystem.Repository
             return bookings;
         }
 
-        public List<Booking> FindPastBookingsByUserId(string userId)
+        public List<Booking> FindPastBookingsByCustomerId(string customerId)
         {
             List<Booking> bookings = new List<Booking>();
 
@@ -191,7 +189,7 @@ namespace FlightBookingSystem.Repository
                     AND f.DEPARTURE < SYSTIMESTAMP";
 
             using OracleCommand cmd = new OracleCommand(query, conn);
-            cmd.Parameters.Add(new OracleParameter("userId", userId));
+            cmd.Parameters.Add(new OracleParameter("userId", customerId));
 
             using OracleDataReader reader = cmd.ExecuteReader();
 
@@ -199,7 +197,7 @@ namespace FlightBookingSystem.Repository
             {   
                 string bookingId = reader["BOOKINGID"].ToString()!;
                 DateTime bookingDate = Convert.ToDateTime(reader["BOOKINGDATE"]);
-                BookingStatus status = Enum.Parse<BookingStatus>(reader["STATUS"].ToString()!);
+                BookingStatus bookingStatus = Enum.Parse<BookingStatus>(reader["STATUS"].ToString()!);
 
                 string dbUserId = reader["USERID"].ToString()!;
                 string dbFlightId = reader["FLIGHTID"].ToString()!;
@@ -212,7 +210,7 @@ namespace FlightBookingSystem.Repository
                     Booking booking = new Booking(
                     bookingId,
                     bookingDate,
-                    status,
+                    bookingStatus,
                     customer,
                     flight 
                 );
@@ -229,11 +227,11 @@ namespace FlightBookingSystem.Repository
             using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
             conn.Open();
 
-            string query = "UPDATE BOOKINGS SET STATUS = :status WHERE BOOKINGID = :bookingId";
+            string query = "UPDATE BOOKINGS SET STATUS = :bookingStatus WHERE BOOKINGID = :bookingId";
 
             using OracleCommand cmd = new OracleCommand(query, conn);
 
-            cmd.Parameters.Add(new OracleParameter("status", booking.Status.ToString()));
+            cmd.Parameters.Add(new OracleParameter("bookingStatus", booking.BookingStatus.ToString()));
             cmd.Parameters.Add(new OracleParameter("bookingId", booking.BookingId));
             
             cmd.ExecuteNonQuery();
@@ -247,13 +245,13 @@ namespace FlightBookingSystem.Repository
             string query = @"INSERT INTO BOOKINGS 
                              (BOOKINGID, BOOKINGDATE, STATUS, USERID, FLIGHTID)
                              VALUES 
-                             (:bookingId, :bookingDate, :status, :userId, :flightId)";
+                             (:bookingId, :bookingDate, :bookingStatus, :userId, :flightId)";
 
             using OracleCommand cmd = new OracleCommand(query, conn);
 
             cmd.Parameters.Add(new OracleParameter("bookingId", bookings.BookingId));
             cmd.Parameters.Add(new OracleParameter("bookingDate", bookings.BookingDate));
-            cmd.Parameters.Add(new OracleParameter("status", bookings.Status.ToString()));
+            cmd.Parameters.Add(new OracleParameter("bookingStatus", bookings.BookingStatus.ToString()));
             cmd.Parameters.Add(new OracleParameter("userId", bookings.Customer.UserId));
             cmd.Parameters.Add(new OracleParameter("flightId", bookings.Flight.FlightId));
 

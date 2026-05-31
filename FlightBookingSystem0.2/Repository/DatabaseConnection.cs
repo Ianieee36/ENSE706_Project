@@ -10,7 +10,7 @@ namespace FlightBookingSystem.Repository
         // Private constructor prevents external instantiation
         private DatabaseConnection()
         {
-            connectionString = "User Id=system;Password=1234;Data Source=localhost:1521/XE;";
+            connectionString = "User Id=system;Password=1234;Data Source=localhost:1521/xe;";
         }
 
         // Global access point
@@ -35,7 +35,14 @@ namespace FlightBookingSystem.Repository
         {
             using OracleConnection conn = GetConnection();
             conn.Open();
+
             Console.WriteLine("Database connected successfully!");
+            Console.WriteLine($"Data Source: {conn.DataSource}");
+
+            using OracleCommand cmd = new OracleCommand("SELECT USER FROM dual", conn);
+            string currentUser = cmd.ExecuteScalar()!.ToString()!;
+
+            Console.WriteLine($"Connected as: {currentUser}");
         }
     }
 }
