@@ -38,7 +38,7 @@ namespace FlightBookingSystem.Utilities
         {
             while(true)
             {
-                Console.WriteLine("Enter phone number (10 digits): ");
+                Console.Write("Enter phone number (10 digits): ");
                 string? phoneNumber = Console.ReadLine();
 
                 if(string.IsNullOrWhiteSpace(phoneNumber))
