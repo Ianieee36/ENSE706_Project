@@ -8,44 +8,45 @@ public class Program
     {   
         static void Main(string[] args) // Main Menu
         {
-            
-            // Database connection
-            DatabaseConnection dbConnection = new DatabaseConnection();
-
-            // Repositories
-            UserRepository userRepository = new UserRepository(dbConnection);
-
-            FlightRepository flightRepository = new FlightRepository(dbConnection);
-
-            BookingRepository bookingRepository = new BookingRepository(
-                userRepository,
-                flightRepository,
-                dbConnection
-            );
-
-            // Services
-            UserService userService = new UserService(userRepository);
-
-            FlightService flightService = new FlightService(flightRepository);
-
-            BookingService bookingService = new BookingService(
-                bookingRepository,
-                userRepository,
-                flightRepository
-            );
-
-            // Utilities 
+            //Utilities
             InputHelper inputHelper = new InputHelper();
 
-            // Menus
+            // repositories
+            IUserRepository userRepository = new UserRepository();
+            IFlightRepository flightRepository = new FlightRepository();
+            IBookingRepository bookingRepository = new BookingRepository(userRepository, flightRepository);
+            ITicketRepository ticketRepository = new TicketRepository(bookingRepository);
+
+            // services
+            ITicketService ticketService = new TicketService(
+                ticketRepository
+            );
+
+            IUserService userService = new UserService(userRepository);
+
+            IFlightService flightService = new FlightService(flightRepository);
+
+            IBookingService bookingService = new BookingService(
+                bookingRepository,
+                userRepository,
+                flightRepository,
+                ticketService,
+                ticketRepository
+            );
+
+            // menus
             CustomerMenu customerMenu = new CustomerMenu(
                 flightService,
                 bookingService,
+                ticketService,
+                userService,
                 inputHelper
             );
 
             AdminMenu adminMenu = new AdminMenu(
                 flightService,
+                bookingService,
+                userService,
                 inputHelper
             );
 
@@ -58,5 +59,6 @@ public class Program
             );
 
             mainMenu.DisplayMainMenu();
+
         }
     }
