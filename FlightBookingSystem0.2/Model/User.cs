@@ -13,6 +13,7 @@ namespace FlightBookingSystem.Model
         private DateTime dateOfBirth;
         private string address;
         private string phoneNumber;
+        
 
         // User constructor 
         public User(string userId, string email, string passwordHash, string firstName, string lastName, 
@@ -61,7 +62,7 @@ namespace FlightBookingSystem.Model
 
         public string FullName
         {
-            get {return FullName + " " + LastName;}
+            get {return firstName + " " + LastName;}
         } 
         
         public DateTime DateOfBirth
@@ -82,23 +83,37 @@ namespace FlightBookingSystem.Model
             private set{phoneNumber = value;}
         }
 
-        public void UpdateProfile(string newfName, string newlName, string newAddress, string newPhoneNumber)
+        public void UpdateProfile(string? newEmail = null, 
+                                  string? newFirstName = null, 
+                                  string? newLastName = null, 
+                                  string? newAddress = null, 
+                                  string? newPhoneNumber = null)
         {
-            FirstName = newfName;
-            LastName = newlName;
-            Address = newAddress;
-            PhoneNumber = newPhoneNumber;
+            if (!string.IsNullOrWhiteSpace(newEmail))
+                Email = newEmail;
+            
+            if (!string.IsNullOrWhiteSpace(newFirstName))
+                FirstName = newFirstName;
+            
+            if (!string.IsNullOrWhiteSpace(newLastName))
+                LastName = newLastName;
+
+            if (!string.IsNullOrWhiteSpace(newAddress))
+                Address = newAddress;
+
+            if (!string.IsNullOrWhiteSpace(newPhoneNumber))
+                PhoneNumber = newPhoneNumber;
+            
         }
 
-        public bool ChangePassword(string oldPassword, string newPassword)
+        public void ChangePassword(string newPasswordHash)
         {
-            if(PasswordHash != oldPassword)
+            if (string.IsNullOrWhiteSpace(newPasswordHash))
             {
-                return false;
+                throw new ArgumentException("Password cannot be empty.");
             }
-            
-            PasswordHash = newPassword;
-            return true;
+
+            PasswordHash = newPasswordHash;
         }
 
     }

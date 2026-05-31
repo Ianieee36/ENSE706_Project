@@ -38,6 +38,18 @@ namespace FlightBookingSystem.Model
             private set{bookingId = value;}
         }
 
+        public DateTime BookingDate
+        {
+            get{return bookingDate;}
+            private set{bookingDate = value;}
+        }
+
+        public BookingStatus BookingStatus
+        {
+            get{return status;}
+            private set{status = value;} // attribute can only modify by its own class.
+        }
+
         public User Customer
         {
             get{return customer;}
@@ -50,46 +62,24 @@ namespace FlightBookingSystem.Model
             private set{flight = value;}
         }
 
-        public DateTime BookingDate
-        {
-            get{return bookingDate;}
-            private set{bookingDate = value;}
-        }
-
-        public BookingStatus Status
-        {
-            get{return status;}
-            private set{status = value;} // attribute can only modify by its own class.
-        }
-
-        public void Confirm()
-        {
-            if (Status != BookingStatus.PENDING)
-            {
-                throw new InvalidOperationException("Only pending bookings can be confirmed");
-            }
-
-            Status = BookingStatus.CONFIRMED;
-        }
-
-        public void Cancel()
+        public void CancelBooking()
         {
             if (!CanBeCancelled())
             {
                 throw new InvalidOperationException("This booking cannot be cancelled");
             }
 
-            Status = BookingStatus.CANCELLED;
+            BookingStatus = BookingStatus.CANCELLED;
         }
 
         public bool IsActive()
         {
-            return Status == BookingStatus.CONFIRMED;
+            return BookingStatus == BookingStatus.CONFIRMED;
         }
 
         public bool CanBeCancelled()
         {
-            return Status == BookingStatus.PENDING || Status == BookingStatus.CONFIRMED;
+            return BookingStatus == BookingStatus.PENDING || BookingStatus == BookingStatus.CONFIRMED;
         }
     }
 }
