@@ -1,4 +1,5 @@
 using System;
+using FlightBookingSystem.Factory;
 using FlightBookingSystem.Model;
 using FlightBookingSystem.Repository;
 using FlightBookingSystem.Security;
@@ -15,26 +16,29 @@ namespace FlightBookingSystem.Services
             this.userRepository = userRepository; // assign injected repository dependency
         }
 
-        public User? Login(string email, string passwordHash)
+        public User? Login(string email, string password)
         {
             User? user = userRepository.FindUserByEmail(email); // search email through the database
 
+            string hashedPassword = PasswordHasher.HashPassword(password);
+
             if(user == null) // checks if user email exists 
             {
-                return null;
+                throw new Exception("User cannot be null");
             }
 
-            if(user.PasswordHash != passwordHash) // checks if the stored password matches the entered password.
+            if(user.PasswordHash != hashedPassword) // checks if the stored password matches the entered password.
             {
-                return null;
+                throw new Exception("Password does not match");
             }
 
             return user; // return user
         }
 
-        public Customer? RegisterCustomer(Customer customer)
+        public Customer? RegisterCustomer(string email, string password, string firstName, string lastName,
+            DateTime dateOfBirth, string address, string phoneNumber)
         {
-            User? existingUser = userRepository.FindUserByEmail(customer.Email); // checks DB with any existing emails
+            User? existingUser = userRepository.FindUserByEmail(email); // checks DB with any existing emails
 
             // Enail already exists
             if(existingUser != null) 
@@ -44,15 +48,17 @@ namespace FlightBookingSystem.Services
 
             string userId = GenerateUniqueCustomerId();
 
-            Customer newCustomer = new Customer(
+            string hashPassword = PasswordHasher.HashPassword(password);
+
+            Customer newCustomer = UserFactory.CreateCustomer(
                 userId,
-                customer.Email,
-                customer.PasswordHash,
-                customer.FirstName,
-                customer.LastName,
-                customer.DateOfBirth,
-                customer.Address,
-                customer.PhoneNumber
+                email,
+                hashPassword,
+                firstName,
+                lastName,
+                dateOfBirth,
+                address,
+                phoneNumber
             );
             
             // Save to database
@@ -62,7 +68,8 @@ namespace FlightBookingSystem.Services
             return newCustomer;
         }
 
-        public Admin? RegisterAdmin(Admin currentAdmin, Admin admin)
+        public Admin? RegisterAdmin(Admin currentAdmin, string email, string password, string firstName, string lastName,
+            DateTime dateOfBirth, string address, string phoneNumber, AdminLevel adminLevel)
         {   
             if(currentAdmin == null)
             {
@@ -74,7 +81,7 @@ namespace FlightBookingSystem.Services
                 throw new Exception("Only system admins can create admin accounts.");
             }
 
-            User? existingUser = userRepository.FindUserByEmail(admin.Email); // checks DB with any existing emails
+            User? existingUser = userRepository.FindUserByEmail(email); // checks DB with any existing emails
 
             // Enail already exists
             if(existingUser != null) 
@@ -84,16 +91,18 @@ namespace FlightBookingSystem.Services
 
             string userId = GenerateUniqueAdminId();
 
-            Admin newAdmin = new Admin(
+            string hashPassword = PasswordHasher.HashPassword(password);
+
+            Admin newAdmin =  UserFactory.CreateAdmin(
                 userId,
-                admin.Email,
-                admin.PasswordHash,
-                admin.FirstName,
-                admin.LastName,
-                admin.DateOfBirth,
-                admin.Address,
-                admin.PhoneNumber,
-                admin.AdminLevel
+                email,
+                hashPassword,
+                firstName,
+                lastName,
+                dateOfBirth,
+                address,
+                phoneNumber,
+                adminLevel
             );
             
             // Save to database

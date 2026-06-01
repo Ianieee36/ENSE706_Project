@@ -2,6 +2,7 @@ using FlightBookingSystem.Services;
 using FlightBookingSystem.Model;
 using FlightBookingSystem.Utilities;
 using FlightBookingSystem.Security;
+using FlightBookingSystem.Factory;
 
 namespace FlightBookingSystem.UI
 {
@@ -164,7 +165,6 @@ namespace FlightBookingSystem.UI
             {
                 Console.WriteLine($"Error: {ex.Message}");
             }
-            inputHelper.Pause();
         }
 
         private void HandleRemoveFlight(Admin admin)
@@ -351,12 +351,10 @@ namespace FlightBookingSystem.UI
                     _ => throw new Exception("Invalid admin level.")
                 };
 
-                string hashedPassword = PasswordHasher.HashPassword(password);
-
-                Admin newAdmin = new Admin(
+                Admin newAdmin = UserFactory.CreateAdmin(
                     "",
                     email,
-                    hashedPassword,
+                    password,
                     firstName,
                     lastName,
                     dob,
@@ -365,7 +363,8 @@ namespace FlightBookingSystem.UI
                     adminLevel
                 );
 
-                User? createdAdmin = userService.RegisterAdmin(currentAdmin, newAdmin);
+                User? createdAdmin = userService.RegisterAdmin(currentAdmin, email, password, firstName, 
+                                                        lastName, dob, address, phoneNumber, adminLevel);
 
                 if(createdAdmin == null)
                 {

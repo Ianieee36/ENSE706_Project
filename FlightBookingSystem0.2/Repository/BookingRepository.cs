@@ -15,17 +15,26 @@ namespace FlightBookingSystem.Repository
         }
 
         public Booking? FindBookingById(string bookingId)
-        {
+        {   
+            // Obtain a shared database connection using the Singleton
             using OracleConnection conn = DatabaseConnection.Instance.GetConnection();
-            conn.Open();
+            
+            // Establishes a connection to the Oracle database
+            // so booking records can be retrieved  
+            conn.Open(); 
 
+            // Retrieve a booking record matching the supplied booking ID
             string query = "SELECT * FROM BOOKINGS WHERE BOOKINGID = :bookingId";
-
+            
+            // Allows to execute SQL Statements
             using OracleCommand cmd = new OracleCommand(query, conn);
+            // It represents variables and acts as a placeholder.
             cmd.Parameters.Add(new OracleParameter("bookingId", bookingId));
-
+            
+            // Retrieve, read, and process data from DB
             using OracleDataReader reader = cmd.ExecuteReader();
 
+            // Reconstruct the Booking domain object from database data
             if (reader.Read())
             {
                 string dbBookingId = reader["BOOKINGID"].ToString()!;

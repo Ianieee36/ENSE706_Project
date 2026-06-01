@@ -81,8 +81,13 @@ namespace FlightBookingSystem.UI
             {
                 Console.Clear();
 
-                string origin = inputHelper.ReadProperName("origin")!;
-                string destination = inputHelper.ReadProperName("destination")!;
+                string origin = inputHelper.ReadProperName("origin (enter B to go back)")!;
+                string destination = inputHelper.ReadProperName("destination (enter B to go back)")!;
+
+                if(origin == "B" || destination == "B")
+                {
+                    return;
+                }
 
                 List<Flight> flights =
                     flightService.SearchFlights(origin, destination);
@@ -114,7 +119,7 @@ namespace FlightBookingSystem.UI
                 foreach (Flight f in flights)
                 {
                     Console.WriteLine(
-                        $"{f.FlightId} || {f.Origin} -> {f.Destination} || {f.DepartureDateTime:dd/MM/yyyy hh:mm tt}"
+                        $"{f.FlightId} || {f.Origin} -> {f.Destination} || {f.DepartureDateTime:dd/MM/yyyy hh:mm}"
                     );
                 }
 
@@ -152,43 +157,48 @@ namespace FlightBookingSystem.UI
 
         public void HandleViewFlightDetails()
         {       
-                Console.WriteLine("\n");
-                Console.Write("Enter flight id: ");
-                string? flightId = Console.ReadLine()!.ToUpper();
+            Console.WriteLine("\n");
+            Console.Write("Enter flight id (enter B to go back): ");
+            string? flightId = Console.ReadLine()!.ToUpper();
 
-                if(string.IsNullOrWhiteSpace(flightId))
-                {
-                    Console.WriteLine("Flight Id is required.");
-                    inputHelper.Pause();
-                    return;
-                }
+            if(flightId == "B")
+            {
+                return;
+            }
 
-                Flight? flight = flightService.GetFlightDetailsById(flightId);
-
-                if(flight == null)
-                {
-                    Console.WriteLine("Flight not found");
-                    inputHelper.Pause();
-                    return;
-                }
-
-                Console.Clear();
-                Console.WriteLine("==== Flight Details ====");
-                Console.WriteLine($"======== {flightId} ========");
-                Console.WriteLine($"Origin: {flight.Origin}");
-                Console.WriteLine($"Destination: {flight.Destination}");
-                Console.WriteLine($"Departure: {flight.DepartureDateTime:dd/MM/yyyy hh:mm tt}");
-                Console.WriteLine($"Available Seats: {flight.AvailableSeats}");
-                Console.WriteLine($"Total Seats: {flight.TotalSeats}");
-
+            if(string.IsNullOrWhiteSpace(flightId))
+            {
+                Console.WriteLine("Flight Id is required.");
                 inputHelper.Pause();
+                return;
+            }
+
+            Flight? flight = flightService.GetFlightDetailsById(flightId);
+
+            if(flight == null)
+            {
+                Console.WriteLine("Flight not found");
+                inputHelper.Pause();
+                return;
+            }
+
+            Console.Clear();
+            Console.WriteLine("==== Flight Details ====");
+            Console.WriteLine($"======== {flightId} ========");
+            Console.WriteLine($"Origin: {flight.Origin}");
+            Console.WriteLine($"Destination: {flight.Destination}");
+            Console.WriteLine($"Departure: {flight.DepartureDateTime:dd/MM/yyyy hh:mm}");
+            Console.WriteLine($"Available Seats: {flight.AvailableSeats}");
+            Console.WriteLine($"Total Seats: {flight.TotalSeats}");
+
+            inputHelper.Pause();
         }
 
         private void HandleBookFlight(Customer currentUser)
         {
             try
             {
-                Console.Write("\nEnter Flight ID to book, or B to go back: ");
+                Console.Write("\nEnter Flight ID to book (enter B to go back): ");
                 string? flightId = Console.ReadLine();
 
                 if (string.IsNullOrWhiteSpace(flightId))
@@ -268,7 +278,7 @@ namespace FlightBookingSystem.UI
 
                         Console.WriteLine(
                             $"Departure: " +
-                            $"{booking.Flight.DepartureDateTime:dd/MM/yyyy hh:mm tt}"
+                            $"{booking.Flight.DepartureDateTime:dd/MM/yyyy hh:mm}"
                         );
 
                         Console.WriteLine(
@@ -311,8 +321,13 @@ namespace FlightBookingSystem.UI
 
             try
             {
-                Console.Write("Enter booking ID to cancel: ");
-                string bookingId = Console.ReadLine()!;
+                Console.Write("Enter booking ID to cancel (enter B to go back): ");
+                string bookingId = Console.ReadLine()!.ToUpper();
+
+                if(bookingId == "B")
+                {
+                    return;
+                }
 
                 if(string.IsNullOrWhiteSpace(bookingId))
                 {
@@ -368,7 +383,7 @@ namespace FlightBookingSystem.UI
             {   
                 Console.WriteLine($"{b.BookingId} || " +
                                   $"{b.Flight.Origin} -> {b.Flight.Destination} || " +
-                                  $"{b.Flight.DepartureDateTime: dd/MM/yyyy hh:mm tt}"
+                                  $"{b.Flight.DepartureDateTime: dd/MM/yyyy hh:mm}"
 
                 );
             }
@@ -382,8 +397,13 @@ namespace FlightBookingSystem.UI
 
             try
             {
-                Console.Write("Enter Booking ID: ");
+                Console.Write("Enter Booking ID (enter B to go back): ");
                 string bookingId = Console.ReadLine()!.ToUpper();
+
+                if(bookingId == "B")
+                {
+                    return;
+                }
 
                 Console.Clear();
 
@@ -541,12 +561,17 @@ namespace FlightBookingSystem.UI
             {
                 Console.WriteLine("\n========= Change Password ===========");
 
-                string oldPassword = inputHelper.ReadRequiredInput("current password");
+                string oldPassword = inputHelper.ReadRequiredInput("current password (enter B to go back)");
 
-                string newPassword = inputHelper.ReadRequiredInput("new password");
+                string newPassword = inputHelper.ReadRequiredInput("new password (enter B to go back)");
 
-                string confirmPassword = inputHelper.ReadRequiredInput("confirm password");
+                string confirmPassword = inputHelper.ReadRequiredInput("confirm password (enter B to go back)");
 
+                if(oldPassword == "B" || newPassword == "B" || confirmPassword == "B")
+                {
+                    return;
+                }
+                
                 if(newPassword != confirmPassword)
                 {
                     Console.WriteLine("Password do not match.");

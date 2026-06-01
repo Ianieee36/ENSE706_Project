@@ -1,11 +1,12 @@
 
 namespace FlightBookingSystem.Model
 {
-    public class Customer : User
+    public class Customer : User // Inherits from User Class
     {
         private int loyaltyPoints;
         private MembershipTier membershipTier;
 
+        
         public Customer(
             string userId,
             string email,

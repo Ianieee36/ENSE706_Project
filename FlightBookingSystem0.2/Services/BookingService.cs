@@ -83,13 +83,19 @@ namespace FlightBookingSystem.Services
             // updates flight 
             flightRepository.UpdateFlight(flight);
 
+            // Issue Ticket
             Ticket bookingTicket = ticketService.IssueTicket(newBooking);
 
+            // Save Ticket
             ticketRepository.SaveTicket(bookingTicket);
 
+            // Explicit casting
             Customer customer = (Customer)user;
 
+            // Adds 100 points after booking
             customer.AddLoyaltyPoints(100);
+
+            // Update customer loyalty points
             userRepository.UpdateCustomerLoyalty(customer);
 
             // returns newBooking

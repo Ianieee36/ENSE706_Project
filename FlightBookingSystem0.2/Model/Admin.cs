@@ -1,4 +1,3 @@
-
 namespace FlightBookingSystem.Model
 {
     public class Admin : User

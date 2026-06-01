@@ -47,7 +47,7 @@ namespace FlightBookingSystem.Model
         public BookingStatus BookingStatus
         {
             get{return status;}
-            private set{status = value;} // attribute can only modify by its own class.
+            private set{status = value;} // property can only modify by its own class.
         }
 
         public User Customer

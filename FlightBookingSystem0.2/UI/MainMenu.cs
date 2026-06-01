@@ -2,6 +2,7 @@ using FlightBookingSystem.Utilities;
 using FlightBookingSystem.Model;
 using FlightBookingSystem.Services;
 using FlightBookingSystem.Security;
+using FlightBookingSystem.Factory;
 
 namespace FlightBookingSystem.UI
 {
@@ -82,9 +83,7 @@ namespace FlightBookingSystem.UI
                 // Prompt for password
                 string password = inputHelper.ReadRequiredInput("password"); 
 
-                string hashedPassword = PasswordHasher.HashPassword(password);
-
-                User? user = userService.Login(email, hashedPassword);
+                User? user = userService.Login(email, password);
 
                 // validate if the email and password exists
                 if(user == null)
@@ -120,26 +119,22 @@ namespace FlightBookingSystem.UI
             DateTime dob = inputHelper.ReadDateOfBirth();
             string address = inputHelper.ReadRequiredInput("address").ToUpper();
             string phoneNumber = inputHelper.ReadPhoneNumber();
-            
-            // hash password
-            string hashedPassword = PasswordHasher.HashPassword(password);
 
             // creates new customer
-            Customer? newCustomer = new Customer(
+            Customer? newCustomer = UserFactory.CreateCustomer(
                 "",
                 email,
-                hashedPassword,
+                password,
                 firstName,
                 lastName,
                 dob,
                 address,
-                phoneNumber,
-                0,
-                MembershipTier.BRONZE
+                phoneNumber
             );
 
             // registers customer and saves it to database
-            Customer? customer = userService.RegisterCustomer(newCustomer);
+            Customer? customer = userService.RegisterCustomer(email, password, firstName, lastName, dob, 
+                                                            address, phoneNumber);
 
             // check if the registered customer already existed
             if(customer == null)

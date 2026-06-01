@@ -1,4 +1,4 @@
-using System.Transactions;
+using FlightBookingSystem.Factory;
 using FlightBookingSystem.Model;
 using Oracle.ManagedDataAccess.Client;
 
@@ -236,7 +236,7 @@ namespace FlightBookingSystem.Repository
                 MembershipTier membershipTier = Enum.Parse<MembershipTier>(reader["MEMBERSHIPTIER"].ToString()!
                 );
 
-                return new Customer(
+                return UserFactory.CreateCustomerFromDatabase(
                     userId,
                     email,
                     passwordHash,
@@ -263,7 +263,7 @@ namespace FlightBookingSystem.Repository
                 AdminLevel adminLevel = Enum.Parse<AdminLevel>(reader["ADMINLEVEL"].ToString()!
                 );
 
-                return new Admin(
+                return UserFactory.CreateAdmin(
                     userId,
                     email,
                     passwordHash,
