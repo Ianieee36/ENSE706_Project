@@ -5,7 +5,7 @@ using FlightBookingSystem.Repository;
 namespace FlightBookingSystem.Services
 {
 
-    public class TicketService : ITicketService
+    internal class TicketService : ITicketService
     {
         private readonly ITicketRepository ticketRepository;
 
