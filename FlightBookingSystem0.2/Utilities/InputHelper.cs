@@ -23,7 +23,7 @@ namespace FlightBookingSystem.Utilities
             while(true)
             {
                 Console.Write($"Enter {fieldName}: ");
-                string? input = Console.ReadLine();
+                string? input = Console.ReadLine()!;
 
                 if(!string.IsNullOrWhiteSpace(input))
                 {

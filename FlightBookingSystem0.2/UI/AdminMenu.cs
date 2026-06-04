@@ -239,7 +239,6 @@ namespace FlightBookingSystem.UI
                 {
                     Console.WriteLine($"Cannot set total seats below current booked seats ({bookedSeats})."
                     );
-                    inputHelper.Pause();
                     return;
                 }
 

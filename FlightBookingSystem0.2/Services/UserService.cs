@@ -24,12 +24,12 @@ namespace FlightBookingSystem.Services
 
             if(user == null) // checks if user email exists 
             {
-                throw new Exception("User cannot be null");
+                return null;
             }
 
             if(user.PasswordHash != hashedPassword) // checks if the stored password matches the entered password.
             {
-                throw new Exception("Password does not match");
+                return null;
             }
 
             return user; // return user

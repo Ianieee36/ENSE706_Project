@@ -81,10 +81,15 @@ namespace FlightBookingSystem.UI
             {
                 Console.Clear();
 
-                string origin = inputHelper.ReadProperName("origin (enter B to go back)")!;
-                string destination = inputHelper.ReadProperName("destination (enter B to go back)")!;
+                string origin = inputHelper.ReadProperName("origin (enter B to go back)")!.ToUpper();
 
-                if(origin == "B" || destination == "B")
+                if(origin == "B")
+                {
+                    return;
+                }
+                string destination = inputHelper.ReadProperName("destination (enter B to go back)")!.ToUpper();
+
+                if(destination == "B")
                 {
                     return;
                 }
@@ -199,7 +204,7 @@ namespace FlightBookingSystem.UI
             try
             {
                 Console.Write("\nEnter Flight ID to book (enter B to go back): ");
-                string? flightId = Console.ReadLine();
+                string? flightId = Console.ReadLine()!.ToUpper();
 
                 if (string.IsNullOrWhiteSpace(flightId))
                 {
@@ -563,14 +568,25 @@ namespace FlightBookingSystem.UI
 
                 string oldPassword = inputHelper.ReadRequiredInput("current password (enter B to go back)");
 
-                string newPassword = inputHelper.ReadRequiredInput("new password (enter B to go back)");
-
-                string confirmPassword = inputHelper.ReadRequiredInput("confirm password (enter B to go back)");
-
-                if(oldPassword == "B" || newPassword == "B" || confirmPassword == "B")
+                if(oldPassword == "B" )
                 {
                     return;
                 }
+                
+                string newPassword = inputHelper.ReadRequiredInput("new password (enter B to go back)");
+                
+                if(newPassword == "B" )
+                {
+                    return;
+                }
+
+                string confirmPassword = inputHelper.ReadRequiredInput("confirm password (enter B to go back)");
+
+                if(confirmPassword == "B" )
+                {
+                    return;
+                }
+                
                 
                 if(newPassword != confirmPassword)
                 {
